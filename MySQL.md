@@ -291,3 +291,233 @@ DELETE * FROM table_name
 
 
 
+### SQL TOP 子句
+
+TOP 子句用于规定要返回的记录数目。
+
+语法：
+
+~~~sql
+SELECT column_name(s)
+FROM table_name
+LIMIT number
+~~~
+
+例如：
+
+~~~sql
+SELECT *
+FROM Persons
+LIMIT 5
+~~~
+
+希望从 Persons 表中选取头两条记录，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT TOP 2 * FROM Persons
+~~~
+
+希望从 Persons 表中选取 50％ 的记录，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT TOP 50 PERCENT * FROM Persons
+~~~
+
+
+
+### SQL LIKE 操作符
+
+**LIKE 操作符用于在 WHERE 子句中搜索列中的指定模式。**
+
+语法：
+
+~~~sql
+SELECT column_name(s)
+FROM table_name
+WHERE column_name LIKE pattern
+~~~
+
+希望从 Persons 表中选取居住在以 "N" 开始的城市里的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City LIKE 'N%'
+~~~
+
+**提示：**"%"可用于定义通配符（模式中缺少的字母）。
+
+希望从 Persons 表中选取居住在包含 "lon" 的城市里的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City LIKE '%lon%'
+~~~
+
+通过使用 NOT 关键字，可以从 Persons 表中选取居住在**不包含** "lon" 的城市里的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City NOT LIKE '%lon%'
+~~~
+
+
+
+### SQL 通配符
+
+在搜索数据库中的数据时，SQL 通配符可以替代一个或多个字符。
+
+SQL 通配符必须与 LIKE 运算符一起使用。
+
+在 SQL 中，可使用以下通配符：
+
+| 通配符         | 描述            |
+| ----------- | ------------- |
+| %           | 替代一个或多个字符     |
+| _           | 仅替代一个字符       |
+| [charlist]  | 字符列中的任何单一字符   |
+| [!charlist] | 不在字符列中的任何单一字符 |
+
+希望从 Persons 表中选取居住在以 "Ne" 开始的城市里的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons 
+WHERE City LIKE 'Ne%'
+~~~
+
+希望从 Persons 表中选取居住在包含 "lond" 的城市里的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City LIKE '%lond%'
+~~~
+
+希望从 Persons 表中选取名字的第一个字符之后是 "eorge"的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE FirstName LIKE '_eorge'
+~~~
+
+希望从 Persons 表中选取的这条记录的姓氏以 "C" 开头，然后是一个任意字符，然后是 "r"，然后是任意字符，然后是 "er"，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE LastName LIKE 'C_r_er'
+~~~
+
+希望从 Persons 表中选取居住的城市以 "A" 或 "L" 或 "N" 开头的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City LIKE '[ALN]%'
+~~~
+
+希望从 Persons 表中选取居住的城市**不以** "A" 或 "L" 或 "N" 开头的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE City LIKE '[!ALN]%'
+~~~
+
+
+
+### SQL  IN 操作符
+
+IN 操作符允许在 WHERE 子句中规定多个值。
+
+语法：
+
+~~~sql
+SELECT column_name(s)
+FROM table_name
+WHERE column_name IN (value1,value2,...)
+~~~
+
+希望从 Persons 表中选取姓氏为 Adams 和 Carter 的人，可以使用下面的 SELECT 语句:
+
+~~~sql
+SELECT * FROM Persons
+WHERE LastName IN ('Adams','Carter')
+~~~
+
+
+
+### SQL BETWEEN 操作符
+
+**BETWEEN 操作符在 WHERE 子句中使用，作用是选取介于两个值之间的数据范围。**
+
+操作符 BETWEEN ... AND 会选取介于两个值之间的数据范围。这些值可以是数值、文本或日期。
+
+语法：
+
+~~~sql
+SELECT column_name(s)
+FROM table_name
+WHERE column_name
+BETWEEN value1 AND value2
+~~~
+
+以字母顺序显示介于 "Adams" (包括) 和 "Carter"  (不包括) 之间的人，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT * FROM Persons
+WHERE LastName
+BETWEEN 'Adams' AND 'Carter'
+~~~
+
+**重要事项：**不同的数据库对 BETWEEN ... AND 操作符的处理方式是有差异的。
+
+如需使用上面的例子显示范围之外的人，可以使用 NOT 操作符：
+
+~~~sql
+SELECT * FROM Persons
+WHERE LastName
+NOT BETWEEN 'Adams' AND 'Carter'
+~~~
+
+
+
+### SQL Alias (别名)
+
+**通过使用 SQL，可以为列名称和表名称指定别名 (Alias)。**
+
+表的语法：
+
+~~~sql
+SELECT column_name(s)
+FROM table_name
+AS alias_name
+~~~
+
+列的语法：
+
+~~~sql
+SELECT column_name AS alias_name
+FROM table_name
+~~~
+
+假设有两个表分别是："Persons" 和 "Product_Orders"。分别为它们指定别名 "p" 和 "po"。现在希望列出 "John Adams" 的所有订单，可以使用下面的 SELECT 语句：
+
+~~~sql
+SELECT po.OrderID,p.LastName,p.FirstName
+FROM Persons AS p,Product_Orders AS po
+WHERE p.LastName='Adams' AND p.FirstName='John'
+~~~
+
+不使用别名的 SELECT 语句：
+
+~~~sql
+SELECT Product_Orders.OrderID,Persons.LastName,Persons.FirstName
+FROM Persons,Product_Orders
+WHERE Persons.LastName='Adams' AND Persons.FirstName='John'
+~~~
+
+使用列名别名，例如：
+
+~~~sql
+SELECT LastName AS Family,FirstName AS Name
+FROM Persons
+~~~
+
+
+
