@@ -489,11 +489,222 @@ $ \sum\limits_{i=1}^n i\quad \prod\limits_{i=1}^n\quad
 \[\iint\quad \iiint\quad \iiiint\quad \idotsint \]
 ~~~
 
+#### 分隔符
+
+各种括号用() [] \\{\\} \langle \rangle 等命令表示。
+
+花括号通常用来输入命令和环境的参数，所以在数学公式中它们前面要加\。
+
+#### 省略号
+
+省略号用\dots \cdots \vdots \ddots 等命令表示。\dots 和 \cdots 的纵向位置不同，前者一般用于有下标的序列。
+
+~~~latex
+\[x_1,x_2,\dots,x_n\quad 1,2,\cdots,n\quad \]
+~~~
+
+
+
+### 矩阵
+
+数学模式下可以用 array 环境来生成矩阵，它提供了外部对齐和列对齐的控制参数
+
+外部对齐是指整个矩阵和周围对象的纵向关系，有三种方式：居顶、居中（缺省）、居底，分别用t，c，b来表示；列对齐也有三种方式：居左、居中、居右，分别用l，c，r表示。
+
+\\\\ 和 &用来分隔行和列，语法如下：
+
+~~~latex
+\begin{array}[外部对齐]{列对齐}
+	行列内容
+\end{array}
+~~~
+
+~~~latex
+\[\begin{array}{ccc}
+x_1 & x_2 & \dots \\
+x_3 & x_4 & \dots \\
+\vdots & \vdots & \ddots
+\end{array}\]
+~~~
+
+\smallmatrix 命令可以生成行间矩阵：
+
+~~~latex
+Marry has a little matrix $(\begin{smallmatrix} a&b\\c&d \end{smallmatrix})$.
+~~~
+
+
+
+### 多行公式
+
+有时一个公式太长一行放不下，或几个公式需要写成一组，就要用到 amsmath 提供的一些多行公式环境。
+
+#### 长公式
+
+无需对齐的长公式可以使用 multline 环境，需要对齐的长公式可以使用 split 环境，它本身不能独立使用，必须包含在其他数学环境内，因此也称作次环境。用 \\\\ 和 & 来分行和设置对齐的位置。
+
+无对齐长公式：
+
+~~~latex
+\begin{multline}
+x = a+b+c+{} \\
+	d+e+f+g
+\end{multline}
+~~~
+
+对齐长公式：
+
+~~~latex
+\[\begin{split}
+x ={} &a+b+c+{} \\
+	  &d+e+f+g
+\end{split}\]
+~~~
+
+#### 公式组
+
+不需要对齐的公式组可以使用 gather 环境，需要对齐的公式组用 align 环境。
+
+无对齐公式组：
+
+~~~latex
+\begin{gather}
+a = b+c+d \\
+x = y+z
+\end{gather}
+~~~
+
+对齐公式组：
+
+~~~latex
+\begin{align}
+a &= b+c+d \\
+x &= y+z
+\end{align}
+~~~
+
+multline，gather，align 等环境都有带 * 的版本，不生成公式编号。
+
+#### 分支公式
+
+分段函数通常用 cases 次环境写成分支公式：
+
+~~~latex
+\[y=\begin{cases}
+	-x,\quad x\leq 0 \\
+	x,\quad x>0
+\end{cases}\]
+~~~
+
+
+
+### 定理和证明
+
+\newtheorem 命令可以用来定义定理之类的环境，其语法如下：
+
+> {环境名}[编号延续]{显示名}[编号层次]
+
+下面的代码定制了四个环境：定义、定理、引理和推论，他们都在一个 section 内统一编号，而引理和推论会延续定理的编号：
+
+~~~~latex
+\newtheorem{definition}{定义}[section]
+\newtheorem{theorem}{定理}[section]
+\newtheorem{lemma}[theorem]{引理}
+\newtheorem{corollary}[theorem]{推论}
+~~~~
+
+使用如下：
+
+~~~latex
+\begin{definition}
+Java 是一种跨平台的编程语言。
+\end{definition}
+\begin{theorem}
+咖啡因可以刺激人的中枢神经。
+\end{theorem}
+\begin{lemma}
+茶和咖啡都会使人的大脑兴奋。
+\end{lemma}
+\begin{corollary}
+晚上喝咖啡可能会导致失眠。
+\end{corollary}
+~~~
+
+amsthm 宏包提供的 proof 环境可以用来输入证明，它会在证明结尾加一个 QED 符号：
+
+~~~latex
+\begin{proof}[命题物质无限可分的证明]
+	一尺之棰，日取其半，万世不竭。
+\end{proof}
+~~~
 
 
 
 
 
+## 插图
+
+### 图形概览
+
+#### 图形格式
+
+LaTeX 支持点阵图形格式 JPEG 和 PNG，也支持矢量格式 EPS 和 PDF。对于示意图，我们应该首选矢量格式；包含大量自然色彩的图像（比如照片）应该选 JPEG；人工点阵图像应该选 PNG。
+
+#### 图形优化
+
+矢量图形的一个优点是可以无限缩放，而输出质量不变。图形尺寸对矢量图形而言意义不大。描述矢量图形所需数据较少，所以其文件体积一般也较小。
+
+而点阵图形是以像素为单位描述、存储的，图形尺寸越大，文件体积就越大。当然影响文件体积的还有色彩深度、压缩算法等因素。
+
+人们一般希望用较小的文件体积获取较好的输出效果，这就需要优化图形尺寸和色彩。
+
+**图形尺寸**
+
+点阵图形的像素是一种相对尺寸，其实际尺寸等于像素除以分辨率。最常用的分辨率单位是像素/英尺(PPI)。
+
+比如有一幅100x150像素的点阵图形，其分辨率为100 PPI。在输出时，它的缺省尺寸就是1 inX1.5 in。如果强制输出为2 inX3 in，那么其实际分辨率就降为 50 PPI。
 
 
 
+### 插入图形
+
+#### 基本命令
+
+基本用法如下：
+
+~~~latex
+\usepackage[dvipdfm]{graphicx}
+\includegraphics[bb=0 0 300 200]{fig.png}
+~~~
+
+引用 graphicx 宏包时可加驱动选项。pdflatex 用 pdftex，但是它知道驱动就是自己，其实不用加该选项。
+
+#### 图形操作
+
+\includegraphics 命令有一些参数选项可以用于缩放、旋转、裁剪等图形操作，简要说明如下：
+
+- 如果不设置任何尺寸参数，pdflatex 按缺省输出尺寸处理。如果图形文件缺少 PPI，会按72 PPI 计算输出尺寸。
+
+| scale=s | 缩放比。绝对尺寸和缩放比用一种即可，同时使用两者，绝对尺寸起作用         |
+| ------- | ---------------------------------------- |
+|         | 保持图形比例。宽度和高度通常设置一个即可，否则图形比例会失调，除非再加上此选项，这样图形宽度和高度都不超过指定参数 |
+
+~~~latex
+\includegraphics[width=60pt]{homer.pdf}
+\includegraphics[width=80pt,height=100pt,keepaspectratio]{homer.pdf}
+~~~
+
+#### 文件名和路径
+
+若想省略文件后缀或路径名，可以使用如下命令：
+
+~~~latex
+\DeclareGraphicsExtensions{.eps,.mps,.pdf,.jpg,.png}
+\graphicspath{{c:/secret-garden/}}
+\graphicspath{{./img/}}
+\graphicspath{{one-little/}{two-little/}{three-little-indians/}}
+~~~
+
+其中，第一行指定后缀列表让编译程序自行查找；后三行设置缺省搜索路径，分别使用了绝对路径、相对路径、多个路径。
+
+**注意：**文件名和路径名都不能有空格；路径名分隔符最好用/，这样可以在多种操作系统上通用；路径名要用/
