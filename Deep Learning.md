@@ -122,5 +122,121 @@ b=b-alpha*db
 
 ### 向量化
 
+~~~python
+z=np.dot(w,x)+b
+~~~
 
+~~~python
+import numpy as np	#导入 numpy 库
+a=np.array([1,2,3,4])	#创建一个数据 a
+print(a)
+#[1 2 3 4]
+
+import time		#导入时间库
+a=np.random.rand(1000000)
+b=np.random.rand(1000000)	#通过 round 随机得到两个一百万维度的数组
+tic=time.time()		#现在测量一下当前时间
+
+#向量化的版本
+c=np.dot(a,b)
+toc=time.time()
+print("Vectorized version:"+str(1000*(toc-tic))+"ms")	#打印向量化版本的时间
+
+#继续增加非向量化的版本
+c=0
+tic=time.time()
+for i in range(1000000):
+	c+=a[i]*b[i]
+toc=time.time()
+print(c)
+print("For loop:"+str(1000*(toc-tic))+"ms")		#打印 for 循环版本的时间huo
+~~~
+
+如果使用了 built-in 函数，像 np.function 或并不要求实现循环的函数，可以让 python 充分利用并行化计算。
+
+GPU 更加擅长 SIMD 计算。
+
+经验法则是，无论什么时候，避免使用明确的 for 循环。
+
+如果有一个向量 v，并且想要对向量 v 的每个元素做指数操作，从而得到向量 u。首先，初始化向量 u=np.zeros(n,1)，并且通过循环依次计算每个元素。但事实可以通过 python 的 numpy 内置函数计算，u=np.exp(v)。
+
+numpy 库有很多向量函数。如 u=np.log 是计算对数函数，np.abs() 是计算数据的绝对值，np.maximum() 计算元素中最大值，也可以用 np.maximum(v,0)，v**2 代表获得每个元素的平方。
+
+
+
+### 向量化逻辑回归
+
+Z=np.dot(w.T,X)+b。python 中有个巧妙的地方，这里 b 是一个实数，但是当向量加上这个实数时，会自动扩展成 1xm 的行向量，这被称为广播。
+
+
+
+### 向量化逻辑回归的梯度输出
+
+~~~
+db=1/m*np.sum(dZ)
+dw=1/m*X*dZ.T
+~~~
+
+
+
+### python 中的广播
+
+~~~python
+import numpy as np
+A=np.array([[56.0,0.0,4.4,68.0],[1.2,104.0,52.0,8.0],[1.8,135.0,99.0,0.9]])
+print(A)
+
+cal=A.sum(axis=0)
+print(cal)
+
+percentage=100*A/cal.reshape(1,4)
+print(percentage)
+~~~
+
+axis 用来指明将要进行的运算是沿哪个轴执行，在 numpy 中，0 轴是垂直的，而 1 轴是水平的。
+
+技术上来讲，不需要再将矩阵 cal 重塑成 1x4。但是当我们不确定矩阵维度时，通常会对矩阵进行重塑来确保得到想要的列向量或行向量。reshape 是个常量时间的操作，调用代价极低。
+
+广播机制与执行的运算种类无关。
+
+如果两个数组的后缘维度的轴长度相符或其中一方的轴长度为 1，则认为它们是广播兼容的。广播会在缺失维度和轴长度为 1 的维度上进行。
+
+后缘维度的轴长度：A.shape[-1]，即矩阵维度元组中最后一个位置的值。
+
+
+
+### 关于numpy 向量的说明
+
+如果将一个列向量添加到一个行向量中，你以为会报出维度不匹配或类型错误之类的错误，但实际上会得到一个行向量和列向量的求和。
+
+~~~python
+import numpy as np
+a=np.random.randn(5)
+print(a)	#一维数组，既不是一个行向量，也不是一个列向量
+
+print(a.shape)
+
+print(a.T)	#和 a 相同
+
+print(np.dot(a,a.T))	#得到一个数
+~~~
+
+建议编写神经网络时，不要在它的结构是一维数组时使用数据结构。
+
+~~~python
+a=np.random.randn(5,1)
+print(a)
+
+print(a.T)	#行向量
+
+print(np.dot(a,a.T))	#返回一个矩阵
+~~~
+
+每次创建一个数组，都让它成为一个列向量或行向量，其行为会更容易被理解。
+
+
+
+
+
+## 浅层神经网络
 
