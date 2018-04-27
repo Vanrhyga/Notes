@@ -454,6 +454,50 @@ df.groupby("grade").size()
 
 
 
+## 画图
+
+~~~python
+ts=pd.Series(np.random.randn(1000),index=pd.date_range('1/1/2000',periods=1000))
+
+ts=ts.cumsum()
+
+ts.plot()
+~~~
+
+在数据框中，plot() 可以非常方便地把所有列作为标签绘制在图标上。
+
+
+
+## 输入/输出数据
+
+### CSV
+
+把数据输出为 csv 文件：
+
+~~~python
+df.to_csv('foo.csv')
+~~~
+
+读取 csv 文件：
+
+~~~python
+pd.read_csv('foo.csv')
+~~~
+
+### Excel
+
+输出至 excel 文件：
+
+~~~python
+df.to_excel('foo.xlsx',sheet_name='Sheet1')
+~~~
+
+读取 excel 文件：
+
+~~~python
+pd.read_excel('foo.xlsx','Sheet1',index_col=None,na_values=['NA'])
+~~~
+
 
 
  
