@@ -101,9 +101,91 @@ PR 曲线中的 P（Precision）和 R（Recall）分别意为“查准率”和�
 
 
 
-
-
 ## 画法
 
 每取一个阈值，即可算得一组相应的 Precision 值与 Recall 值。以 Recall 为横坐标，Precision 为纵坐标绘制曲线图，即可得到 PR 曲线。
+
+
+
+
+
+# SVM
+
+支持向量机（Support Vector Machine）
+
+## 了解 SVM
+
+### 什么是支持向量机 SVM
+
+分类作为数据挖掘领域中一项非常重要的任务，其目的是学会一个分类函数或分类器，而支持向量机本身便是一种监督式学习的方法，它广泛应用于统计分类及回归分析中。
+
+SVM 是 90 年代中期发展起来的基于统计学习理论的一种机器学习方法，通过寻求结构化风险最小来提高学习机泛化能力，实现经验风险和置信范围的最小化，从而达到在统计样本量较少的情况下，亦能获得良好统计规律的目的。
+
+通俗来讲，它是一种二分类模型，其基本模型定义为特征空间上的间隔最大的线性分类器，即支持向量机的学习策略便是间隔最大化，最终可转化为一个凸二次规划问题的求解。
+
+
+
+### 线性分类
+
+线性分类器（也叫做感知机，这里的机表示一种算法）
+
+- 分类标准
+
+考虑一个两类的分类问题，数据点用 x 来表示（这是一个 n 维向量），w^T 中的 T 代表转置，而类别用 y 来表示，可以取 1 或 -1，分别代表两个不同的类。
+
+一个线性分类器的学习目标就是要在 n 维的数据空间中找到一个分类超平面，其方程可以表示为：
+
+![image-20180801214006762](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801214006762.png)
+
+上面给出了线性分类的定义描述，但为何用 y 取 1 或者 -1来表示两个不同的类别呢？其实，1 或者 -1 的分类标准起源于 logistic 回归。
+
+- 1 或者 -1 分类标准的起源：logistic 回归
+
+Logistic 回归目的是从特征学习出一个 0/1 分类模型，而这个模型是将特性的线性组合作为自变量，由于自变量的取值范围是负无穷到正无穷。因此，使用 logistic 函数（或称作 sigmoid 函数）将自变量映射到（0，1）上，映射后的值被认为是属于 y=1 的概率。
+
+形式化表示即，假设函数：
+
+![image-20180801214639519](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801214639519.png)
+
+其中 x 是 n 维特征向量，函数 g 就是 logistic 函数。
+
+而![image-20180801214735425](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801214735425.png)的图像是：
+
+![image-20180801214849963](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801214849963.png)
+
+可以看到，将无穷映射到了（0，1）。
+
+而假设函数就是特征属于 y=1 的概率：
+
+![image-20180801215000067](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801215000067.png)
+
+![image-20180801215115682](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801215115682.png)
+
+![image-20180801215213876](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801215213876.png)
+
+- 形式化表示
+
+这次使用的结果标签是 y=-1，y=1，替换在 logistic 回归中使用的 y=0
+
+![image-20180801215644194](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801215644194.png)
+
+与 logistic 回归的形式化表示没区别。
+
+![image-20180801220116371](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801220116371.png)
+
+于此，想必已经解释明白了为何线性分类的标准一般用 1 或者 -1 来表示。
+
+- 线性分类的一个例子
+
+一个二维平面（一个超平面，在二维空间中的例子就是一条直线），如下图所示，平面上有两种不同的点，分别用两种不同的颜色表示，一种为红颜色的点，另一种则为蓝颜色的点，红颜色的线表示一个可行的超平面。
+
+![image-20180801220430566](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801220430566.png)
+
+从上图可以看出，红颜色的线把红颜色的点和蓝颜色的点分开来。而这条红颜色的线就是所说的超平面，即所谓的超平面的的确确把这两种不同颜色的数据点分隔开来，在超平面一边的数据点所对应的 y 全是 -1，而在另一边全是 1。
+
+接着，可以令分类函数：
+
+![image-20180801220718834](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801220718834.png)
+
+显然，若 f(x) = 0，那么 x 是位于超平面上的点。不妨要求对于所有满足 f(x) < 0 的点，其对应的 y 等于 -1，而 f(x)>0 则对应 y=1 的数据点。
 
