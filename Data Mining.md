@@ -175,7 +175,9 @@ Logistic 回归目的是从特征学习出一个 0/1 分类模型，而这个模
 
 于此，想必已经解释明白了为何线性分类的标准一般用 1 或者 -1 来表示。
 
-- 线性分类的一个例子
+
+
+### 线性分类的一个例子
 
 一个二维平面（一个超平面，在二维空间中的例子就是一条直线），如下图所示，平面上有两种不同的点，分别用两种不同的颜色表示，一种为红颜色的点，另一种则为蓝颜色的点，红颜色的线表示一个可行的超平面。
 
@@ -187,5 +189,241 @@ Logistic 回归目的是从特征学习出一个 0/1 分类模型，而这个模
 
 ![image-20180801220718834](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180801220718834.png)
 
-显然，若 f(x) = 0，那么 x 是位于超平面上的点。不妨要求对于所有满足 f(x) < 0 的点，其对应的 y 等于 -1，而 f(x)>0 则对应 y=1 的数据点。
+显然，若 f(x) = 0，那么 x 是位于超平面上的点。不妨要求对于所有满足 f(x) \< 0 的点，其对应的 y 等于 -1，而 f(x) > 0 则对应 y=1 的数据点。
+
+有些时候，或者说大部分时候数据并不是线性可分的，此时，满足这样条件的超平面根本不存在。这里先从最简单的情形开始推导，假设数据都是线性可分的，即这样的超平面是存在的。
+
+下面的篇幅将按下述 3 点走：
+
+1.需要确定上述分类函数 f(x)=w.x+b（w.x 表示 w 与 x 的内积）中的两个参数 w 和 b。
+
+2.如何确定 w 和 b 呢？答案是寻找两条边界端或极端划分直线中间的最大间隔（之所以要寻最大间隔是为了能更好地划分不同的点），从而确定最终的最大间隔分类超平面 hyper plane 和分类函数。
+
+3.进而把寻求分类函数 f(x)=w.x+b 的问题转化为对 w，b 的最优化问题，最终转化为对偶因子的求解。
+
+总结：从最大间隔出发，转化为求对变量 w 和 b 的凸二次规划问题。
+
+
+
+### 函数间隔 Functional margin 与几何间隔 Geometrical margin
+
+一般而言，一个点距离超平面的远近可以表示为分类预测的确信或准确程度。
+
+在超平面 w*x+b=0 确定的情况下，|w\*x+b|能够相对地表示点 x 距离超平面的远近，而 w\**x+b 的符号与类标记 y 的符号是否一致表示分类是否正确。所以，可以用 y*(w\*x+b) 的正负性来判定或表示分类的正确性和确信度。
+
+于此，便引出了定义样本到分类间隔距离的函数间隔的概念。
+
+- 函数间隔 Functional margin
+
+定义函数间隔 functional margin 为：
+
+![image-20180802094105913](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802094105913.png)
+
+定义超平面（w，b）关于训练数据集 T 的函数间隔为超平面（w，b）关于 T 中所有样本点（xi,yi）的函数间隔最小值。其中，x 是特征，y 是结果标签，i 表示第 i 个样本，有：
+
+![image-20180802094301783](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802094301783.png)
+
+与此同时，问题就出现了。上述定义的函数间隔虽然可以表示分类预测的正确性和确信度，但在选择分类超平面时，只有函数间隔还远远不够。因为若成比例地改变 w 和 b，如变为 2w 和 2b，虽然此时超平面没有改变，但函数间隔的值却变成了原来的 2 倍。
+
+其实，可以对法向量 w 加些约束条件，使其表面上看起来规范化。如此，引出真正定义点到超平面的距离——几何间隔的概念。
+
+- 点到超平面的距离定义：几何间隔 Geometrical margin 
+
+![image-20180802094942947](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802094942947.png)
+
+给出几何间隔的定义前，如上图所示，对于一个点 x，令其垂直投影到超平面，对应点为 x0，由于 w 是垂直于超平面的一个向量，有：
+
+![image-20180802095359361](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802095359361.png)
+
+又由于 x0 是超平面上的点，满足 f(x0)=0，代入超平面方程即可算出：
+
+![image-20180802100046091](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802100046091.png)
+
+不过这里的结果是带符号的，我们需要的只是它的绝对值。因此，类似地，也乘上对应的类别 y 即可。实际定义的几何间隔为：
+
+![image-20180802100435797](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802100435797.png)
+
+函数间隔 y*(w\*x+b)=y\**f(x) 实际上就是 |f(x)|，只是人为定义的一个间隔度量；而几何间隔 |f(x)|/||w|| 才是直观上的点到超平面的距离。
+
+
+
+### 最大间隔分类器 Maximum Margin Classifer 的定义
+
+于此，很明显地看出，函数间隔和几何间隔相差一个||w||的缩放因子。按照之前的分析，对一个数据点进行分类，当它的 margin 越大时，分类的 confidence 越大。对于一个包含 n 个点的数据集，可以很自然地定义它的 margin 为所有 n 个点中 margin 值最小的那个。于是，为了使得分类的 confidence 高，希望所选择的超平面的能够最大化这个 margin 值。
+
+已知：
+
+1.functional margin 明显是不太适合用来最大化的一个量。因为在 hyper plane 固定以后，可以等比例地缩放 w 的长度和 b 的值，使得 f(x) 的值任意大，亦即 functional margin 可以在 hyper plane 保持不变的情况下被取得任意大。
+
+2.而geometrical margin 则没有这个问题，因为除了 ||w|| 这个分母，所以缩放 w 和 b 的时候，它的值是不会改变的，它只随着 hyper plane 的变动而变动。因此，这是更加适合的一个 margin。
+
+这样一来，maximum margin classifier 的目标函数可以定义为：
+
+![image-20180802101702608](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802101702608.png)
+
+当然，还需要满足一些条件，根据 margin 的定义，有：
+
+![image-20180802101831307](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802101831307.png)
+
+处于方便推导和优化的目的，可以令：
+
+![image-20180802102050239](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802102050239.png)
+
+此时，目标函数转化为：
+
+![image-20180802102139803](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802102139803.png)
+
+其中，s.t. 即 subject to，导出约束条件。
+
+通过求解这个问题，可以找到一个 margin 最大的 classifier，如下图所示，中间的红色线条是 Optimal Hyper Plane，另外两条线到红线的距离都是等于几何间隔的：
+
+![image-20180802102427961](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802102427961.png)
+
+通过最大化 margin，使得该分类器对数据进行分类时具有了最大的 confidence，从而设计决策最优分类超平面。
+
+
+
+### 到底什么是 Support Vector
+
+回忆一下下图：
+
+![image-20180802102623011](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802102623011.png)
+
+可以看到两个支撑着中间的 gap 的超平面，它们到中间的纯红线 separating hyper plane 的距离相等，即我们所能得到的最大的几何间隔，而“支撑”这两个超平面的必定会有一些点，而这些“支撑”的点便叫做支撑向量 Support Vector。
+
+如下图，Support Vector 便是蓝色虚线和粉红色虚线上的点：
+
+![image-20180802103014375](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802103014375.png)
+
+很显然，由于这些 Supporting Vector 刚好在边界上，所以他们满足：
+
+![image-20180802103101612](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802103101612.png)
+
+，而对于所有不是支撑向量的点，也就是在“阵地后方”的点，则显然有：
+
+![image-20180802103159883](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802103159883.png)
+
+
+
+
+
+## 深入 SVM
+
+### 从线性可分到线性不可分
+
+- 从原始问题到对偶问题的求解
+
+回忆一下得到的目标函数：
+
+![image-20180802103403523](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802103403523.png)
+
+上述问题等价于：
+
+![image-20180802103517686](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802103517686.png)
+
+1.转化到这个形式后，问题成为了一个凸优化问题。或者更具体地说，因为现在的目标函数是二次的，约束条件是线性的，所以它是一个凸二次规划问题。这个问题可以用任何现成的 QP 的优化包进行求解，归结为一句话即是：在一定的约束条件下，目标最优，损失最小。
+
+2.虽然这个问题确实是一个标准的 QP 问题，但是它也有它的特殊结构，通过 Lagrange Duality 变换到对偶变量 dual variable 的优化问题之后，可以找到一种更加有效的方法来进行求解。而且，通常情况下，这种方法比直接使用通用的 QP 优化包进行优化要高效得多。
+
+也就是说，除了用解决 QP 问题的常规方法之外，还可以通过求解对偶问题得到最优解，这就是线性可分条件下支持向量机的对偶算法。这样做的优点在于：一，对偶问题往往更容易求解；二，可以自然地引入核函数，进而推广到非线性分类问题。
+
+至于上述提到，关于什么是 Lagrange duality？简单地说，通过给每一个约束条件加上一个 Lagrange multiplier（拉格朗日乘值），即引入拉格朗日乘子 α，可将约束条件融合到目标函数里去：
+
+![image-20180802104452140](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802104452140.png)
+
+然后令：
+
+![image-20180802104535808](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802104535808.png)
+
+容易验证，当某个约束条件不满足时，例如：
+
+![image-20180802104647453](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802104647453.png)
+
+显然有：
+
+![image-20180802104727464](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802104727464.png)
+
+而当所有约束条件都满足时，有：
+
+![image-20180802104811674](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802104811674.png)
+
+即我们最初要最小化的量。当然，这里也有约束条件，就是 αi>=0。现在的目标函数变成了：
+
+![image-20180802105057369](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802105057369.png)
+
+现在，把最小和最大的位置交换一下：
+
+![image-20180802112605795](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802112605795.png)
+
+当然，交换后的问题不再等价于原问题，并且有：
+
+![image-20180802112711254](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802112711254.png)
+
+总之，第二个问题的最优值在这里提供了一个第一个问题的最优值的下界。在满足某些条件的情况下，这两者相等，这时就可以通过求解第二个问题来间接地求
+
+解第一个问题。
+
+之所以从 minmax 的原始问题转化为 maxmin 的对偶问题，一是因为两者为近似解，二是转化为对偶问题后，更容易求解。
+
+- KKT 条件
+
+所谓的“满足某些条件”就是要满足 KKT 条件。那 KKT 条件的表现形式是什么呢？
+
+一般地，一个最优化数学模型能够表示成下列标准形式：
+
+![image-20180802113446894](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802113446894.png)
+
+其中，f(x) 是需要最小化的函数，h(x) 是等式约束，g(x) 是不等式约束，p 和 q 分别为等式约束和不等式约束的数量。同时，需要明白以下内容：
+
+![image-20180802113644298](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802113644298.png)
+
+KKT 条件的意义：它是一个非线性规划问题能有最优化解法的必要和充分条件。
+
+那到底什么是所谓 Karush-Kuhn-Tucker 条件呢？KKT 条件就是指上面最优化数学模型的标准形式中的最小点 x* 必须满足下面的条件：
+
+![image-20180802114020529](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802114020529.png)
+
+经过论证，这里的问题是满足 KKT 条件的，因此转化为求解第二个问题。而求解这个对偶学习问题，分为 3 个步骤。首先让 L(w,b,α) 关于 w 和 b 最小化，然后求对 α 的极大，最后利用 SMO 算法求解对偶因子。
+
+- 对偶问题求解的 3 个步骤
+
+1.首先固定 α，要让 L 关于 w 和 b 最小化，分别对 w，b 求偏导数：
+
+![image-20180802114544205](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802114544205.png)
+
+以上结果代回上述的 L：
+
+![image-20180802114614380](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802114614380.png)
+
+得到：
+
+![image-20180802114737513](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802114737513.png)
+
+具体推导过程如下：
+
+![image-20180802115116676](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802115116676.png)
+
+可以看出，此时的拉格朗日函数只包含了一个变量，那就是 αi。
+
+2.求对 α 的极大，即是关于对偶问题的最优化问题，从上面的式子可知，通过：
+
+![image-20180802115638085](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802115638085.png)
+
+可求出 w，通过：
+
+![image-20180802115706341](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802115706341.png)
+
+可求出 b。
+
+目标函数转化为：
+
+![image-20180802120025431](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180802120025431.png)
+
+这个问题有更加高效的优化算法，即 SMO 算法。
+
+- 序列最小最优化 SMO 算法
+
+
+
+
 
