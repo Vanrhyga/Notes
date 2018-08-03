@@ -605,3 +605,169 @@ MInsky 和 Papert 在 20 世纪 60 年代就已经明确指出线性学习器计
 
 ### 使用松弛变量处理 outliers 
 
+有时并不是因为数据本身是非线性结构的，而只是因为数据有噪音。对于这种偏离正常位置很远的数据点，称之为 outlier。在原来的 SVM 模型里，outlier 的存在有可能造成很大的影响，因为超平面本身就是只有少数几个 Support Vector 决定的，如果这些 Support Vector 里又存在 outlier 的话，其影响就很大了。如下图：
+
+![image-20180803103253798](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803103253798.png)
+
+用黑圈圈起来的蓝点是一个 outlier，它偏离了自己原本所应该在的那半个空间，如果直接忽略掉它，原来的分隔超平面还是挺好的，但是由于 outlier 的出现，导致分隔超平面不得不歪曲，同时 margin 也相应变小了。当然，更严重的情况是，如果这个 outlier 再往右上移动一些距离，将无法构造出能将数据分开的超平面。
+
+为了处理这种情况，SVM 允许数据点在一定程度上偏离超平面。例如上图中，黑色实线所对应的距离，就是 outlier 偏离的距离。如果把它移动回来，就刚好落在原来的超平面上，从而不会使得超平面发生变形。
+
+原来的约束条件为：
+
+![image-20180803104212641](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104212641.png)
+
+现在考虑到 outlier 问题，约束条件变成了：
+
+![image-20180803104256577](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104256577.png)
+
+其中：
+
+![image-20180803104310738](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104310738.png)
+
+称为松弛变量 slack variable，对应数据点 Xi 允许偏离的 functional margin 的量。当然，如果松弛变量任意大的话，那么任意的超平面都是符合条件的了。所以，在原来的目标函数后面加上一项，使得这些松弛变量的总和也要最小：
+
+![image-20180803104517463](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104517463.png)
+
+其中，C 是一个参数，用于控制目标函数中两项（”寻找 margin 最大的超平面“和”保证数据点偏差量最小“）之间的权重。注意，其中松弛变量是需要优化的变量之一，而 C 是一个事先确定好的常量。完整写出来，如下：
+
+![image-20180803104721433](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104721433.png)
+
+用之前的方法将限制或约束条件加入到目标函数中，得到新的拉格朗日函数，如下：
+
+![image-20180803105003796](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803105003796.png)
+
+分析方法和前面一样：
+
+![image-20180803104858592](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803104858592.png)
+
+代回 L 并化简，得到和原来一样的目标函数：
+
+![image-20180803105128835](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803105128835.png)
+
+由于有 ri>=0（作为 Lagrange multiplier 的条件），因此有 αi<=C，所以整个 dual 问题写作：
+
+![image-20180803105346176](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803105346176.png)
+
+前后结果唯一的区别就是现在 dual variable α 多了一个上限 C，而 Kernel 化的非线性形式也是一样的。
+
+
+
+
+
+## 证明 SVM
+
+### 线性学习器
+
+- 感知机算法
+
+目的：不断训练以期寻找一个合适的超平面。
+
+![image-20180803110143345](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110143345.png)
+
+如下图所示，凭直觉可以看出，图中的红线是最优超平面，最终，若蓝线能通过不断的训练移动到红线位置上，则代表训练成功。
+
+![image-20180803110321869](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110321869.png)
+
+既然需要通过不断的训练让蓝线最终成为最优分类超平面，那么，到底需要训练多少次呢？Novikoff 定理说明当间隔是正的时候，感知机算法会在有限次数的迭代中收敛：
+
+![image-20180803110505909](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110505909.png)
+
+![image-20180803110539117](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110539117.png)
+
+根据误分次数公式可知，迭代次数与对应于扩充权重的训练集的间隔有关。
+
+扩充间隔即为样本到分类间隔的距离，即从扩充间隔引出的最大分类间隔：
+
+![image-20180803110739431](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110739431.png)
+
+![image-20180803110824400](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803110824400.png)
+
+同时有一点值得注意：感知机算法虽然可以通过简单迭代对线性可分数据生成正确分类的超平面，但不是最优效果。怎样才能得到最优效果呢？就是之前曾解释过的寻找最大分类间隔超平面。
+
+
+
+### 非线性学习器
+
+- Mercer 定理
+
+![image-20180803111123387](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803111123387.png)
+
+ 
+
+### 损失函数
+
+曾有这样一段话”SVM 是 90 年代中期发展起来的基于统计学习理论的一种机器学习方法，通过寻求结构化风险最小来提高学习机泛化能力，实现经验风险和置信范围的最小化，从而达到在统计样本量较少的情况下，亦能获得良好统计规律的目的。“什么是结构化风险？什么又是经验风险？要了解这两个所谓的”风险“，还得从监督学习说起。
+
+监督学习实际上就是一个经验风险或结构风险函数的最优化问题。风险函数度量平均意义下模型预测的好坏，模型每一次预测的好坏用损失函数来度量。它从假设空间 F 中选择模型 f 作为决策函数，对于给定的输入 X，由 f(X) 给出相应的输出 Y，这个输出的预测值 f(X) 与真实值 Y 可能一致也可能不一致，用一个损失函数来度量预测错误的程度。损失函数记为 L(Y,f(X))。
+
+常用的损失函数有以下几种：
+
+![image-20180803111955115](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803111955115.png)
+
+给定一个训练数据集：
+
+![image-20180803112018213](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803112018213.png)
+
+模型 f(X) 关于训练数据集的平均损失称为经验风险，如下：
+
+![image-20180803112656014](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803112656014.png)
+
+关于如何选择模型，监督学习有两种策略：经验风险最小化和结构风险最小化。
+
+经验风险最小化的策略认为，经验风险最小的模型是最优的模型，即求解如下最优化问题：
+
+![image-20180803113332965](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803113332965.png)
+
+当样本容量很小时，经验风险最小化的策略容易产生过拟合的现象。结构风险最小化可以防止过拟合。结构风险是在经验风险的基础上加上表示模型复杂度的正则化项或罚项，结构风险定义如下：
+
+![image-20180803113641565](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803113641565.png)
+
+其中 J(f) 为模型的复杂度，模型 f 越复杂，J(f) 值就越大，也就是说 J(f) 是对复杂模型的惩罚。λ>=0 是系数，用以权衡经验风险和模型复杂度。结构风险最小化的策略认为结构风险最小的模型是最优的模型，所以求最优的模型就是求解下面的最优化问题：
+
+![image-20180803113950969](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803113950969.png)
+
+这样，监督学习问题就变成了经验风险或结构风险函数的最优化问题。
+
+
+
+### 最小二乘法
+
+- 什么是最小二乘法？
+
+口头中经常说：一般来说，平均来说。如平均来说，不吸烟的健康优于吸烟者，之所以要加”平均“二字，是因为凡事皆有例外，总存在某个特别的人他吸烟但由于经常锻炼，他的健康状况可能会优于他身边不吸烟的朋友。而最小二乘法的一个最简单的例子便是算术平均。
+
+最小二乘法（又称最小平方法）是一种数学优化技术。它通过最小化误差的平方来寻找数据的最佳函数匹配。利用最小二乘法可以简便地求得未知的数据，并使得这些求得的数据与实际数据之间误差的平方和为最小。用函数表示：
+
+![image-20180803115251010](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803115251010.png)
+
+使误差平方和达到最小以寻求估计值的方法，就叫做最小二乘法。用最小二乘法得到的估计，叫做最小二乘估计。当然，取平方和作为目标函数只是众多可取的方法之一。
+
+有效的最小二乘法是勒让德在 1805 年发表的，其基本思想就是认为测量中有误差，所以所有方程的累计误差为：
+
+![image-20180803120300596](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803120300596.png)
+
+求解出导致累计误差最小的参数即可：
+
+![image-20180803120415871](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803120415871.png)
+
+勒让德在论文中对最小二乘法的优良性做了几点说明：
+
+1.最小二乘使得误差平方和最小，并在各个方程的误差之间建立了一种平衡，从而防止某一个极端误差取得支配地位。
+
+2.计算中只要求偏导后求解线性方程组，计算过程明确便捷
+
+3.最小二乘可以导出算术平均值作为估计值。
+
+对于最后一点，从统计学的角度来看是很重要的一个性质。推理如下：![image-20180803120743727](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180803120743727.png)
+
+由于算术平均是一个历经考验的方法，而以上的推理说明，算术平均是最小二乘的一个特例，所以从另一个角度说明了最小二乘方法的优良性。
+
+本质上说，最小二乘法是一种参数估计方法。就参数估计，得从一元线性模型说起。
+
+- 最小二乘法的解法
+
+什么是一元线性模型呢？先来梳理几个基本概念：
+
+1.监督学习中，如果预测的变量是离散的
+
