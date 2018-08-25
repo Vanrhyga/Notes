@@ -1366,3 +1366,214 @@ print('偏差：',clf.intercept_)
 通过利用“one versus all”（OVA）方法来组合多个二分类器，从而实现多分类。对于每一个 K 类，可以训练一个二分类器来区分自身和其他 K-1 个类。
 
 在 multi-class classification （多类分类）的情况下， coef_ 是 shape=[n_classes, n_features] 的一个二维数组， intercept_ 是 shape=[n_classes] 的一个一维数组。 coef_ 的第 i 行保存了第 i 类的 OVA 分类器的权重向量；类以升序索引。 注意，原则上，由于允许创建一个概率模型，所以 loss=”log” 和 loss=”modified_huber” 更适合于 one-vs-all 分类。 
+
+~~~python
+#随机梯度下降进行多分类
+from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import accuracy_score
+from sklearn import datasets
+iris=datasets.load_iris()
+x,y=iris.data,iris.target
+clf=SGDClassifier(alpha=0.001,max_iter=100).fit(x,y)
+yPred=clf.predict(x)
+print('三分类花卉数据准确率：',accuracy_score(y,yPred))
+print('包含的二分类器索引：',clf.classes_)	#one versus all 方法来组合多个二分类器
+print('回归系数：',clf.coef_)	#每个二分类器的回归系数
+print('偏差：',clf.intercept_)	#每个二分类器的偏差
+~~~
+
+
+
+
+
+# 朴素贝叶斯
+
+## 朴素贝叶斯算法说明
+
+朴素贝叶斯算法是建立在每个特征值间独立的基础上的监督学习分类算法，这也是它称为“朴素”贝叶斯的缘由。在现实环境中，很难达到两个特征值间绝对的相互独立。在给定一个类变量 y 和依赖的特征向量 x ，贝叶斯定理如下：
+
+ ![image-20180825105841681](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825105841681.png)
+
+假设两个特征值间相互独立，关系被简化为：
+
+![image-20180825110057689](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825110057689.png)
+
+由于分母是恒定的输入，可以使用以下的分类规则：
+
+![image-20180825110205100](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825110205100.png)
+
+可以使用最大后验概率(MAP)，来估计 p(y) 和 p(x|y)。不同朴素贝叶斯分类算法是因为它们对 p(x|y) 做出了不同的假设。
+
+尽管朴素贝叶斯的假设过于简单，但在已有的应用中，如文档分类和垃圾邮件分类，它都表现出了相当好的效果。
+
+和其他更先进的方法相比，朴素贝叶斯算法学习和分类的过程效率更高。每个类的条件特征的独立分布意味着每个类分布可以独立地估计为一维分布，这反过来有助于缓解数据降维所带来的麻烦。
+
+
+
+## 高斯朴素贝叶斯
+
+GaussianNB 继承高斯朴素贝叶斯，特征可能性被假设为：
+
+![image-20180825110807931](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825110807931.png)
+
+~~~python
+import numpy as np
+from sklearn.naive_bayes import GaussianNB
+x=np.array([[-1,-1][-2,-1],[-3,-2],[1,1],[2,1,],[3,2]])
+y=np.array([1,1,1,2,2,2])
+clf.GaussianNB.fit(x,y)
+print clf.predict([[-0.8,-1]])
+
+#partial_fit说明：增量地训练一批样本
+#这种方法连续几次在不同的数据集，从而实现核心和在线学习。当数据集很大的时候，不适合在内存中运算
+clfPf=GaussianNB().partial_fit(x,y,np.unique(y))
+print clfPf.predict([[-0.8,-1]])
+~~~
+
+
+
+## 多项式分布
+
+MultinomialNB 实现 multinomially 分布数据的贝叶斯算法，是一个经典的朴素贝叶斯文本分类使用的变种。
+
+对每一个 y 来说，分布通过向量：
+
+![image-20180825111652498](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825111652498.png)
+
+![image-20180825111731781](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825111731781.png)
+
+![image-20180825111808537](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825111808537.png)
+
+![image-20180825111853102](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825111853102.png)
+
+平滑先验 α>=0 防止学习样本中不存在的特征在计算中概率为 0，设置 α=1，称为拉普拉斯平滑，α<1，称为 Lidstone 平滑。
+
+~~~python
+import numpy as np
+from sklearn.naive_bayes import MultinomialNB
+x=np.random.randint(5,size=(6,100))
+y=np.array([1,2,3,4,5,6])
+clf=MultinomialNB().fit(x,y)
+print clf.predict(x[2:3])
+~~~
+
+
+
+## 伯努利朴素贝叶斯
+
+BernoulliNB 实现多元伯努利分布数据的贝叶斯算法。例如，可能会有多个特征，但每个被假定为一个二进制值（伯努利，布尔）变量。因此，这类要求的样本被表示为二进制值的特征向量。
+
+![image-20180825112738711](/var/folders/1w/qg5brywj515cgfsy3bp72ll40000gn/T/abnerworks.Typora/image-20180825112738711.png)
+
+在文本分类的情况下，词的出现向量（而不是字计数向量）可以用来训练和分类。
+
+~~~python
+import numpy as np
+from sklearn.naive_bayes import BernoulliNB
+x=np.random.randint(2,size=(6,100))
+y=np.array([1,2,3,4,4,5])
+clf=BernoulliNB()
+clf.fit(x,y)
+BernoulliNB(alpha=0.1,binarize=0.0,class_prior=None,fit_prior=True)
+print(clf.predict(x[2:3]))
+~~~
+
+
+
+
+
+# yield
+
+## 可迭代对象
+
+~~~python
+#mylist是一个可迭代的对象。当使用一个列表生成式来建立列表的时候，就建立了一个可迭代的对象
+mylist=[x*x for x in range(3)]
+for i in mylist:
+    print(i)
+~~~
+
+输出为：
+
+~~~python
+0
+1
+4
+~~~
+
+在这里，所有的值都存在内存中，所以并不适合大量数据
+
+
+
+## 生成器
+
+- 可迭代
+- 只能读取一次
+- 实时生成数据，不全存在内存中
+
+~~~python
+mygenerator=(x*x for x in range(3))
+for i in mygenerator:
+    print(i)
+~~~
+
+注意：之后不能再使用 for i in mygenerator 了。
+
+
+
+## yield 关键字
+
+- yield 是一个类似于 return 的关键字，只是这个函数返回的是个生成器
+- 当调用这个函数的时候，函数内部的代码并不立马执行，只是返回一个生成器对象
+- 当使用 for 进行迭代的时候，函数中的代码才会执行
+
+~~~python
+def createGenerator():
+    mylist=range(3)
+    for i in mylist:
+        yield i*i
+        
+mygenerator=createGenerator()
+print(mygenerator)
+for i in mygenerator:
+    print(i)
+~~~
+
+结果为：
+
+~~~python
+<generator object createGenerator at 0xb7555c34>
+0
+1
+4
+~~~
+
+第一次迭代中函数会执行，从开始到达 yield 关键字，然后返回 yield 后的值作为第一次迭代的返回值。然后，每次执行这个函数都会继续执行在函数内部定义的循环的下一次，再返回那个值，直到没有可以返回的。
+
+
+
+
+
+# Keras
+
+Keras 是一个开源的 python 深度学习库，可以基于 theano 或者 TensorFlow。
+
+
+
+## 优化器（optimizers）
+
+优化器是调整每个节点权重的方法。
+
+~~~python
+model=Sequential()
+model.add(Dense(64,init='uniform',input_dim=10))
+model.add(Activation('tanh'))
+model.add(Activation('softmax'))
+sgd=SGD(lr=0.01,decay=1e-6,momentum=0.9,nesterov=True)
+model.compile(loss='mean_squared_error',optimizer=sgd)
+~~~
+
+可以看到优化器在模型编译前定义，作为编译时的两个参数之一。
+
+
+
