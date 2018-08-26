@@ -1575,5 +1575,184 @@ model.compile(loss='mean_squared_error',optimizer=sgd)
 
 可以看到优化器在模型编译前定义，作为编译时的两个参数之一。
 
+代码中的 sgd 是随机梯度下降算法，lr 表示学习速率，momentum 表示动量项。decay 是学习速率的衰减系数（每个 epoch 衰减一次），Nesterov 的值是 False 或者 True，表示使不使用 Nesterov momentum。
+
+除了 sgd，还可以选择的优化器有 RMSprop（适合递归神经网络）、Adagrad、Adadelta、Adam、Adamax、Nadam
+
+
+
+## 目标函数（objectives）
+
+目标函数又称损失函数（loss），目的是计算神经网络的输出与样本标记的差的一种方法，代码示例：
+
+~~~python
+model=Sequential()
+model.add(Dense(64,init='uniform',input_dim=10))
+model.add(Activation('tanh'))
+model.add(Activation('softmax'))
+sgd=SGD(lr=0.01,decay=1e-6,momentum=0.9,nesterov=True)
+model.compile(loss='mean_squared_error',optimizer=sgd)
+~~~
+
+mean_squared_error 是损失函数的名称。
+
+可以选择的损失函数有：mean_squared_error，mean_absolute_error，squared_hinge，hinge，binary_crossentropy，categorical_crossentropy
+
+这里 binary_crossentropy 和 categorical_crossentropy 也就是 logloss
+
+
+
+## 激活函数（activations）
+
+每一个神经网络层都需要一个激活函数，代码示例：
+
+~~~python
+from keras.layers.core import Activation,Dense
+
+model.add(Dense(64))
+model.add(Activation('tanh'))
+
+#或把上面两行合并为：
+model.add(Dense(64,activation='tanh'))
+~~~
+
+可以选择的激活函数有：linear，sigmoid，hard_sigmoid，tanh，softplus，relu，softplus，softmax，softsign，还有一些高级激活函数，比如 PReLU，LeakyReLU 等。
+
+
+
+## 参数初始化（Initializations）
+
+在添加 layer 时调用 init 进行这一层的权重初始化，有两种初始化方法。
+
+###  指定初始化方法名称
+
+示例代码：
+
+~~~python
+model.add(Dense(64,init='uniform'))
+~~~
+
+可以选择的初始化方法有：uniform，lecun_uniform，normal，orthogonal，zero，glorot_normal，he_normal 等。
+
+### 调用对象
+
+该对象必须包含两个参数：shape（待初始化的变量的 shape）和 name（该变量的名字），该可调用对象必须返回一个（Keras）变量，例如 K.variable() 返回的就是这种变量，示例代码：
+
+~~~python
+from keras import backend as K
+import numpy as np
+
+def myInit(shape,name=None):
+    value=np.random.random(shape)
+    return K.variable(value,name=name)
+
+model.add(Dense(64,init=myInit))
+
+#或者
+from keras import initializations
+
+def myInit(shape,name=None):
+    return initializations.normal(shape,scale=0.01,name=name)
+
+model.add(Dense(64,init=myInit))
+~~~
+
+可以通过库中的方法设定每一层的初始化权重，也可以自己初始化权重。自己设定的话，可以精确到每个节点的权重。
+
+
+
+## 层（layer）
+
+keras 的层主要包括：常用层（Core），卷积层（Convolutional），池化层（Pooling），局部连接层，递归层（Recurrent），嵌入层（Embedding）高级激活层，规范层，噪声层，包装层。当然，也可以编写自己的层。
+
+### 对于层的操作
+
+~~~python
+layer.get_weights()	#返回该层的权重
+layer.set_weights(weights)	#将权重加载到该层
+config=layer.get_config()	#保存该层的配置
+layer=layer_from_config(config)	#加载一个配置到该层
+#该层有一个节点时，获得输入张量、输出张量，以及各自的形状：
+layer.input
+layer.output
+layer.input_shape
+layer.output_shape
+#该层有多个节点时(node_index 为节点序号)
+layer.get_input_at(node_index)
+layer.get_output_at(node_index)
+layer.get_input_shape_at(node_index)
+layer.get_output_shape_at(node_index)
+~~~
+
+### Dense 层（全连接层）
+
+~~~python
+keras.layers.core.Dense(output_dim,init='glorot_uniform',activation='linear',weights=None,W_regularizer=None,b_regularizer=None,activity_regularizer=None,W_constraint=None,bias=True,input_dim=None)
+~~~
+
+output_dim：输出数据的维度
+
+init：初始化该层权重的方法
+
+activation：该层的激活函数
+
+weights：numpy array 的 list。该 list 应含有一个形如（input_dim,output_dim）的权重矩阵和一个形如（output_dim,) 的偏置向量
+
+regularizer：正则项，w 为权重的，b 为偏置的，activity 为输出的
+
+constraints：约束项
+
+bias：是否包含偏置向量，是布尔值
+
+input_dim：输入数据的维度
+
+### dropout 层
+
+~~~python
+keras.layers.core.Dropout(p)
+~~~
+
+为输入数据施加 Dropout。Dropout 将在训练过程中的每次参数更新时，随机断开一定百分比（p）的输入神经元连接，用于防止过拟合。
+
+### 递归层（Recurrent）
+
+递归层包含三种模型：LSTM，GRU 和 simpleRNN
+
+#### 抽象层（不可直接使用）
+
+~~~python
+keras.layers.recurrent.Recurrent(weights=None,return_sequences=False,go_backwards=False,stateful=False,unroll=False,consume_less='cpu',input_dim=None,input_length=None)
+~~~
+
+return_sequences：True 返回整个序列，False 返回输出序列的最后一个输出
+
+go_backwards：True 逆向处理输入序列，默认为 False
+
+stateful：布尔值，默认为 False。若为 True，则一个 batch 中下标为 i 的样本的最终状态会用作下一个 batch 同样下标的样本的初始状态
+
+#### 全连接 RNN 网络
+
+~~~python
+keras.layers.recurrent.SimpleRNN(output_dim,init='glorot_uniform',inner_init='orthogonal',activation='tanh',W_regularizer=None,U_regularizer=None,b_regularizer=None,dropout_W=0.0,dropout_U=0.0)
+~~~
+
+inner_init：内部单元的初始化方法
+
+dropout_W：0~1 之间的浮点数，控制输入单元到输入门的连接断开比例
+
+dropout_U：0~1 之间的浮点数，控制输入单元到递归连接的断开比例
+
+#### LSTM 层
+
+~~~~python
+keras.layers.recurrent.LSTM(output_dim,init='glorot_uniform',inner_init='orthogonal',forget_bias_init='one',activation='tanh',inner_activation='hard_sigmoid',W_regularizer=None,b_regularizer=None,dropout_W=0.0,dropout_U=0.0)
+~~~~
+
+forget_bias_init：遗忘门偏置的初始化函数
+
+inner_activation：内部单元激活函数
+
+### Embedding 层
+
 
 
