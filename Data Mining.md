@@ -1754,5 +1754,352 @@ inner_activation：内部单元激活函数
 
 ### Embedding 层
 
+model 层是最主要的模块，可以将上面定义的各种基本组件组合起来。
+
+**model 的方法**：
+
+model.summary()：打印出模型概况
+
+model.get_config()：返回包含模型配置信息的 python 字典
+
+model.get_weights()：返回模型权重张量的列表，类型为 numpy array
+
+model.set_weights()：从 numpy array 里将权重载入给模型
+
+model.to_json：返回代表模型的 JSON 字符串，仅包含网络结构，不包含权值。可以从 JSON 字符串中重构原模型：
+
+~~~python
+from models import model_from_json
+
+json_string=model.to_json()
+model=model_from_json(json_string)
+~~~
+
+model.to_yaml：与 model.to_json 类似，同样可以从产生的 YAML 字符串中重构模型：
+
+~~~python
+from model import model_from_yaml
+
+yaml_string=model.to_yaml()
+model=model_from_yaml(yaml_string)
+~~~
+
+model.save_weights(filepath)：将模型权重保存到指定路径，文件类型是 HDF5（后缀是 .h5）
+
+model.load_weights(filepath,by_name=False)：从 HDF5 文件中加载权重到当前模型中，默认情况下模型的结构将保持不变。如果想将权重载入不同的模型（有些层相同）中，则设置 by_name=True，只有名字匹配的层才会载入权重。
+
+keras 有两种 model，分别是 Sequential 模型和泛型模型。
+
+#### Sequential 模型
+
+Sequential 是多个网络层的线性堆叠。
+
+可以通过向 Sequential 模型传递一个 layer 的 list 来构造该模型：
+
+~~~python
+from keras.models import Sequential
+from keras.layers import Dense,Activation
+
+model=Sequential([Dense(32,input_dim=784),Activation('relu'),Dense(10),Activation('softmax')])
+~~~
+
+也可以通过 .add() 方法一个个的将 layer 加入模型：
+
+~~~python
+model=Sequential()
+model.add(Dense(32,input_dim=784))
+model.add(Activation('relu'))
+~~~
+
+还可以通过 merge 将两个 Sequential 模型通过某种方式合并。
+
+Sequential 模型的方法：
+
+~~~python
+compile(self,optimizer,loss,metrics=[],sample_weight_mode=None)
+
+fit(self,x,y,batch_size=32,nb_epoch=10,verbose=1,callbacks=[],validation_split=0.0,validation_data=None,shuffle=True,class_weight=None,sample_weight=None)
+
+evaluate(self,x,y,batch_size=32,verbose=1,sample_weight=None)
+
+#按batch获得输入数据对应的输出，函数的返回值是预测值的numpy array
+predict(self,x,batch_size=32,verbose=0)
+
+#按batch产生输入数据的类别预测结果，函数的返回值是类别预测结果的numpy array或numpy
+predict_classes(self,x,batch_size=32,verbose=1)
+
+#按batch产生输入数据属于各个类别的概率，函数的返回值是类别概率的numpy array
+predict_proba(self,x,batch_size=32,verbose=1)
+
+train_on_batch(self,x,y,class_weight=None,sample_weight=None)
+
+test_on_batch(self,x,y,sample_weight=None)
+
+predict_on_batch(self,x)
+
+fit_generator(self,generator,samples_per_epoch,nb_epoch,verbose=1,callbacks=[],validation_data=None,nb_val_samples=None,class_weight=None,
+              max_q_size=10)
+
+evaluate_generator(self,generator,val_samples,max_q_size=10)
+~~~
+
+#### 泛型模型
+
+keras 泛型模型：用户定义多输出模型、非循环有向模型或具有共享层的模型等复杂模型
+
+适用于实现：全连接网络和多输入多输出模型
+
+**泛型模型 model 属性**：
+
+model.layers：组成模型图的各个层
+
+model.inputs：模型的输入张量列表
+
+model.outputs：模型的输出张量列表
+
+方法：类似序列模型的方法
+
+补充：
+
+~~~python
+get_layer(self,name=None,index=None)
+~~~
+
+本函数模型中层的下标或名字获得层对象。泛型模型中层的下标依据自底向上，水平遍历的顺序。
+
+name：字符串，层的名字
+
+index：整数，层的下标
+
+函数的返回值是层对象。
+
+
+
+## backend
+
+什么是“后端”？
+
+Keras 是个模型级的库，提供了快速构建深度学习网络的模块。Keras 并不处理如张量乘法、卷积等底层操作。这些操作依赖于特定的、优化良好的张量操作库。Keras 依赖于处理张量的库就称为“后端引擎”。Keras 提供了三种后端引擎 Theano/TensorFlow/CNTK，并将其函数同一封装，使得用户可以以同一个接口调用不同后端引擎的函数
+
+- Theano 是一个开源的符号主义张量操作框架，由蒙特利尔大学 LISA/MILA 实验室开发
+- TensorFlow 是一个符号主义的张量操作框架，由 Google 开发
+- CNTK 是一个由微软开发的商业级工作包
+
+### keras.json 细节
+
+~~~python
+{
+    "image_data_format":"channels_last",
+    "epsilon":1e-07,
+    "floatx":"float32",
+    "backend":"tensorflow"
+}
+~~~
+
+- image_data_format：字符串，“channels_last” 或 “channels_first”，该选项指定了 Keras 将要使用的维度顺序。可通过 keras.backend.image_data_format() 来获取当前的维度顺序。对  2D 数据来说，“channels_last” 假定维度顺序为（rows,cols,channels)，而 “channels_first” 假定维度顺序为（channels,rows,cols)。对 3D 数据言，”channels_last” 假定（conv_dim1,conv_dim2,conv_dim3,channels)，“channels_first” 则是 (channels,
+
+  conv_dim1,conv_dim2,conv_dim3)
+
+- epsilon：浮点数，防止除 0 错误的小数字
+
+- floatx：字符串，”float16”，“float32”，”float64“ 之一，为浮点数精度
+
+- backend：字符串，所使用的后端，为 ”tensorflow“ 或 ”theano“
+
+### 使用抽象的 Keras 后端来编写代码
+
+如果希望编写的 Keras 模块能够同时在 Theano 和 TensorFlow 两个后端上使用，可以通过 Keras 后端接口来编写代码：
+
+~~~python
+from keras import backend as K
+~~~
+
+ 下面的代码实例化了一个输入占位符，等价于 tf.placeholder()，T.matrix()，T.tensor3() 等：
+
+~~~python
+input=K.placeholder(shape=(2,4,5))
+#also works:
+input=K.placeholder(shape=(None,4,5))
+#also works:
+input=K.placeholder(ndim=3)
+~~~
+
+下面的代码实例化了一个共享变量（shared），等价于 tf.variable() 或 theano.shared()：
+
+~~~python
+val=np.random.random((3,4,5))
+var=K.variable(value=val)
+
+#all-zeros variable:
+var=K.zeros(shape=(3,4,5))
+#all-ones:
+var=K.ones(shape=(3,4,5))
+~~~
+
+### Keras 后端函数
+
+~~~python
+backend()	#返回当前后端
+
+epsilon()	#以数值形式返回一个(一般来说很小的)数，用以防止除0错误
+
+set_epsilon(e)	#设置在数值表达式中使用的fuzz factor，用于防止除0错误，该值应该是一个较小的浮点数
+
+floatx()	#返回默认的浮点数数据类型，为字符串，如'float16','float32','float64'
+
+cast_to_floatx(x)	#将numpy array转换为默认的keras floatx类型，x为numpy array，返回值也为numpy array但其数据类型变为floatx。
+~~~
+
+~~~python
+from keras import backend as K
+
+K.floatx()
+#'float32'
+arr=numpy.array([1.0,2.0],dtype='float64')
+arr.dtype
+#dtype('float64')
+new_arr=K.cast_to_floatx(arr)
+new_arr
+#array([1.,2.],dtype='float32')
+
+image_data_format()	#返回默认的图像的维度顺序('channels_last'或'channels_first')
+
+set_image_data_format(data_format)	#设置图像的维度顺序
+
+is_keras_tensor(x)	#判断x是否是一个keras tensor，返回布尔值
+~~~
+
+~~~python
+from keras import backend as K
+
+np_var=numpy.array([1,2])
+K.is_keras_tensor(np_var)
+#False
+keras_var=K.variable(np_var)
+L.is_keras_tensor(keras_var)	#A variable is not a Tensor.
+#False
+keras_placeholder=K.placeholder(shape=(2,4,5))
+K.is_keras_tensor(keras_placeholder)	#A placeholder is a Tensor.
+#True
+~~~
+
+~~~python
+variable(value,dtype='float32',name=None)	#实例化一个张量，并返回
+~~~
+
+- value：用来初始化张量的值
+- dtype：张量数据类型
+- 张量的名字（可选）
+
+示例:
+
+~~~python
+from keras import backend as K
+val=np.array([[1,2],[3,4]])
+kvar=K.variable(value=val,dtype='float64',name='example_var')
+K.dtype(kvar)
+#'float64'
+print(kvar)
+#example_var
+kvar.eval()
+#array([[1.,2.],[3.,4.]])
+~~~
+
+~~~python
+placeholder(shape=None,ndim=None,dtype='float32',name=None)	#实例化一个占位符，并返回
+~~~
+
+- shape：占位的 shape（整数 tuple，可能包含 None）
+- ndim：占位符张量的阶数，要初始化一个占位符，至少指定 shape 和 ndim 之一，如果都指定则使用 shape
+- dtype：占位符数据类型
+- name：占位符名称（可选）
+
+~~~python
+shape(x)	#返回一个张量的符号shape，符号shape的意思是返回值本身也是一个tensor
+
+from keras import backend as K
+tf_session=K.get_session()
+val=np.array([[1,2],[3,4]])
+kvar=K.variable(value=val)
+input=K.placeholder(shape=(2,4,5))
+K.shape(kvar)
+#<tf.Tensor 'Shape_8:0' shape=(2,) dtype=int32>
+K.shape(input)
+#<tf.Tensor 'Shape_9:0' shape=(3,) dtype=int32>
+
+K.shape(kvar).eval(session=tf_session)
+#array([2, 2], dtype=int32)
+K.shape(input).eval(session=tf_session)
+#array([2, 4, 5], dtype=int32)
+~~~
+
+~~~python
+int_shape(x)	#以整数Tuple或None的形式返回张量shape
+
+from keras import backend as K
+input = K.placeholder(shape=(2, 4, 5))
+K.int_shape(input)
+#(2, 4, 5)
+val = np.array([[1, 2], [3, 4]])
+kvar = K.variable(value=val)
+K.int_shape(kvar)
+#(2, 2)
+
+ndim(x)	#返回张量的阶数，为整数
+K.ndim(input)
+#3
+K.ndim(kvar)
+#2
+
+dtype(x)	#返回张量的数据类型，为字符串
+
+ K.dtype(K.placeholder(shape=(2,4,5)))
+#'float32'
+K.dtype(K.placeholder(shape=(2,4,5), dtype='float32'))
+#'float32'
+K.dtype(K.placeholder(shape=(2,4,5), dtype='float64'))
+#'float64'
+ 
+kvar = K.variable(np.array([[1, 2], [3, 4]]))
+K.dtype(kvar)
+#'float32_ref'
+kvar = K.variable(np.array([[1, 2], [3, 4]]), dtype='float32')
+K.dtype(kvar)
+#'float32_ref'
+
+eval(x)	#求得张量的值，返回一个numpy array
+K.eval(kvar)
+#array([[ 1.,  2.],[ 3.,  4.]], dtype=float32)
+
+zeros(shape,dtype='float32',name=None)	#生成全0张量
+
+kvar = K.zeros((3,4))
+K.eval(kvar)
+#array([[ 0.,  0.,  0.,  0.],[ 0.,  0.,  0.,  0.],[ 0.,  0.,  0.,  0.]], dtype=float32)
+
+ones(shape,dtype='float32',name=None)	#生成全1张量
+
+kvar = K.ones((3,4))
+K.eval(kvar)
+#array([[ 1.,  1.,  1.,  1.],[ 1.,  1.,  1.,  1.],[ 1.,  1.,  1.,  1.]], dtype=float32)
+
+eye(size,dtype='float32',name=None)	#生成单位矩阵
+
+kvar = K.eye(3)
+K.eval(kvar)
+#array([[ 1.,  0.,  0.],[ 0.,  1.,  0.],[ 0.,  0.,  1.]], dtype=float32
+
+zeros_like(x,name=None)	#生成与另一个张量x的shape相同的全0张量
+
+kvar = K.variable(np.random.random((2,3)))
+kvar_zeros = K.zeros_like(kvar)
+K.eval(kvar_zeros)
+#array([[ 0.,  0.,  0.],[ 0.,  0.,  0.]], dtype=float32)
+
+ones_like(x,name=None)	#生成与另一个张量shape相同的全1张量
+
+
+~~~
+
 
 
