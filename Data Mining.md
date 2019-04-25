@@ -2103,3 +2103,161 @@ ones_like(x,name=None)	#生成与另一个张量shape相同的全1张量
 
 
 
+
+
+# Docopt
+
+docopt 是一个用来解析命令行参数的工具，当需要在 Python 程序后附加参数时，就不需要再为此而发愁了。docopt 最大的特点在于不用考虑如何解析命令行参数，而是把需要的格式按一定规则写出来，解析也就完成了。
+
+在 Python 中有一个属性 `__doc__` ，它的值是字符串，一般表示帮助信息。而 docopt 正是利用了这一属性，把帮助信息替换成命令行参数解析说明，再对它进行解析。
+
+~~~pyt&#39;h&#39;p&#39;n
+"""Naval Fate.
+Usage:
+ naval_fate.py ship new <name>...
+ naval_fate.py ship <name> move <x> <y> [--speed=<kn>]
+ naval_fate.py ship shoot <x> <y>
+ naval_fate.py mine (set|remove) <x> <y> [--moored | --drifting]
+ naval_fate.py (-h | --help)
+ naval_fate.py --version
+Options:
+ -h --help  Show this screen.
+ --version  Show version.
+ --speed=<kn> Speed in knots [default: 10].
+ --moored  Moored (anchored) mine.
+ --drifting Drifting mine.
+"""
+from docopt import docopt
+if __name__ == '__main__':
+ arguments = docopt(__doc__, version='Naval Fate 2.0')
+ print(arguments)
+~~~
+
+上述代码段中，很大一段帮助信息是命令行参数解析说明。在函数入口处调用docopt函数进行解析，返回的arguments变量是字典型变量，记录了选项是否被选用，参数的值是什么等信息。当程序从命令行运行时，根据arguments变量的记录来得知用户输入的选项和参数信息。
+
+命令行解析信息包含两部分，分别是使用模式格式和选项描述格式。
+
+## **使用模式格式**
+
+以usage:开始，以空行结束，如上代码段所示。它主要描述了用户添加命令行参数时的格式，也就是使用时的格式，解析也是按照此格式来进行。
+
+每一个使用模式都包含如下元素：
+
+- 参数
+
+参数使用大写字母或尖括号<>围起来。
+
+- 选项
+
+选项以短横线开始（-或者—）。只有一个字母时-o，多于一个字母时--output。同时，可以把多个单字母选项合并，-ovi等同于-o、-v、-i。选项也可以有参数，此时别忘了给选项添加描述说明。
+
+接下来是使用模式中用到的一些标识的含义，正确地使用能够更好地完成解析任务。
+
+- []
+
+代表可选的元素，方括号内的元素可有可无。
+
+- ()
+
+代表必须要有的元素，括号内的元素必须要有，哪怕是多个里选一个。
+
+- |
+
+互斥的元素，竖线两旁的元素只能有一个留下。
+
+- ...
+
+代表元素可以重复出现，最后解析的结果是一个列表。
+
+- [options]
+
+指定特定的选项，完成特定的任务。
+
+
+
+## **选项描述格式**
+
+选项描述同样必不可少，尤其是当选项有参数，并且还需要为它赋默认值时。
+
+为选项添加参数的格式有两种：
+
+~~~python
+-o FILE --output-FILE  
+-i <file>, --input <file> 
+~~~
+
+为选项添加描述说明，只需要用两个空格分隔选项和说明即可。
+
+为选项添加默认值时，把它添加到选择描述后即可，格式如[default: \<my-default-value>]
+
+~~~python
+--coefficient=K The K coefficient [default: 2.95]
+--output=FILE Output file [default: test.txt]
+--directory=DIR Some directory [default: ./]
+~~~
+
+如果选项是可以重复的，那么它的值`[default: ...]`将会一个 list列表，若不可以重复，则它的值是一个字符串。
+
+
+
+## 使用
+
+理解了使用模式格式和选项描述格式后，再配合给出的例子就能较好理解了。
+
+接下来就是得到输入信息了，arguments参数是一个字典类型，包含了用户输入的选项和参数信息，还是上面的代码段例子，假如从命令行运行的输入是
+
+~~~python
+python3 test.py ship Guardian move 100 150 --speed=15
+~~~
+
+那么打印arguments参数如下：
+
+~~~python
+{'--drifting': False,
+ '--help': False,
+ '--moored': False,
+ '--speed': '15',
+ '--version': False,
+ '<name>': ['Guardian'],
+ '<x>': '100',
+ '<y>': '150',
+ 'mine': False,
+ 'move': True,
+ 'new': False,
+ 'remove': False,
+ 'set': False,
+ 'ship': True,
+ 'shoot': False}
+~~~
+
+从打印信息可以看到，对于选项，使用布尔型来表示用户是否输入了该选项；对于参数，则使用具体值来表述。
+
+这样一来，程序就可以从arguments变量中得到下一步操作。若是用户什么参数都没输入，则打印Usage说明提示输入内容。
+
+
+
+
+
+### Epoch
+
+当完整的数据集通过了神经网络一次，这个过程称为一个 epoch。然而，当一个 epoch 对于计算机而言太庞大的时候，就需要把它分成多个小块。
+
+为什么要使用多于一个 epoch?
+
+在神经网络中传递完整的数据集一次是不够的，需要将完整的数据集在同样的神经网络中传递多次。
+
+
+
+### **BATCH**
+
+在不能将数据一次性通过神经网络时，就需要将数据集分成几个 batch。
+
+Batch size指一个 batch 中的样本总数。记住：batch size 和 number of batches 是不同的。
+
+
+
+### 迭代
+
+**迭代**
+
+迭代是 batch 需要完成一个 epoch 的次数。记住：在一个 epoch 中，batch 数和迭代数是相等的。
