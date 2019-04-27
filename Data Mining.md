@@ -2261,3 +2261,650 @@ Batch size指一个 batch 中的样本总数。记住：batch size 和 number of
 **迭代**
 
 迭代是 batch 需要完成一个 epoch 的次数。记住：在一个 epoch 中，batch 数和迭代数是相等的。
+
+
+
+### pd.read_csv()
+
+dl_data.csv文件：
+
+![image-20190426105832337](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190426105832337.png)
+
+行索引为：[-20......19]	列索引为：[-25......25]
+
+~~~python
+q_table = pd.read_csv('dl_data.csv',encoding = "utf-8",header = 0,names = range(0,50))
+~~~
+
+将原来的列索引[-25......25]替换成[0....49]。header = 0是默认情况（即不标明，默认是header = 0），表示以数据第一行为列索引。
+
+    encoding = "utf-8"表明以utf-8为编码规则。
+    names = range(0,50)表示以[0....49]为列索引名字
+~~~python
+q_table = pd.read_csv('dl_data.csv',encoding = "utf-8",header = None,names = range(0,50))
+~~~
+
+给数据添加列索引[0....49]，header = None表示原始数据没有列索引。就算数据里有列索引，这时就把原来的列索引当成数据。
+
+上面两个语句都会默认为数据添加行索引，即会把原来的行索引当成数据，自己再添加新的行索引[0,1,2.....]。如果不想添加新的行索引，代码如下:
+
+~~~python
+q_table = pd.read_csv('dl_data.csv',encoding = "utf-8",index_col=0)
+~~~
+
+index_col=0表示以原有数据的第一列(索引为0)当作行索引。
+
+- 参数详解
+
+**filepath_or_buffer** : str，pathlib。可以是URL，可用URL类型包括：http, ftp, s3和文件。本地文件读取实例：://localhost/path/to/table.csv
+
+**sep** : str, default ‘,’。指定分隔符。如果不指定参数，则会尝试使用逗号分隔。
+
+**header** : int or list of ints。指定行数用来作为列名，数据开始行数。header参数可以是一个list，例如：[0,1,3]，这个list表示将文件中的这些行作为列标题（意味着每一列有多个标题），介于中间的行将被忽略（例如本例中的数据1,2,4行将被作为多级标题出现，第3行数据将被丢弃，dataframe的数据从第5行开始）。注意：如果skip_blank_lines=True 那么header参数忽略注释行和空行，所以header=0表示第一行数据而不是文件第一行。
+
+**names** : array-like, default None。用于结果的列名列表，如果数据文件中没有列标题行，就需要执行header=None。默认列表中不能出现重复，除非设定参数mangle_dupe_cols=True。
+
+**index_col** : int or sequence or False, default None。用作行索引的列编号或者列名，如果给定一个序列则有多个行索引。
+
+**mangle_dupe_cols** : boolean, default True。重复的列，将‘X’...’X’表示为‘X.0’...’X.N’。如果设定为false，则会将所有重名列覆盖。
+
+**dtype** : Type name or dict of column -> type, default None。每列数据的数据类型。例如 {‘a’: np.float64, ‘b’: np.int32}
+
+**converters** : dict, default None。列转换函数的字典。key可以是列名或列的序号。
+
+**skiprows** : list-like or integer, default None。需要忽略的行数（从文件开始处算起），或需要跳过的行号列表（从0开始）。
+
+**encoding** : str, default None。指定字符集类型，通常指定为'utf-8'.
+
+
+
+### eval()
+
+eval() 函数用来执行一个字符串表达式，并返回表达式的值。
+
+```python
+eval(expression[, globals[, locals]])
+```
+
+- expression -- 表达式。
+- 返回值 -- 返回表达式计算结果。
+
+```python
+>>> x = 7
+>>> eval( '3 * x' )
+21
+>>> eval('pow(2,2)')
+4
+>>> eval('2 + 2')
+4
+>>> n=81
+>>> eval("n + 4")
+85
+```
+
+
+
+
+
+### 切片
+
+对于X[:,0]：取二维数组中第一维的所有数据。
+
+对于X[:,1]：取二维数组中第二维的所有数据。
+
+对于X[:,m:n]：取二维数组中第m维到第n-1维的所有数据。
+
+对于X[:,:,0]：取三维矩阵中第一维的所有数据。
+
+对于X[:,:,1]：取三维矩阵中第二维的所有数据。
+
+对于X[:,:,m:n]：取三维矩阵中第m维到第n-1维的所有数据。
+
+~~~python
+data_list=[[1,2,3],[1,2,1],[3,4,5],[4,5,6],[5,6,7],[6,7,8],[6,7,9],[0,4,7],[4,6,0],[2,9,1],[5,8,7],[9,7,8],[3,7,9]]
+data_list=np.array(data_list)
+
+X[:,0]结果输出为：
+[1 1 3 4 5 6 6 0 4 2 5 9 3]
+X[:,1]结果输出为：
+[2 2 4 5 6 7 7 4 6 9 8 7 7]
+X[:,0:1]结果输出为：
+[[1]
+ [1]
+ [3]
+ [4]
+ [5]
+ [6]
+ [6]
+ [0]
+ [4]
+ [2]
+ [5]
+ [9]
+ [3]]
+
+data_list=[[[1,2],[1,0],[3,4],[7,9],[4,0]],[[1,4],[1,5],[3,6],[8,9],[5,0]],[[8,2],[1,8],[3,5],[7,3],[4,6]],
+[[1,1],[1,2],[3,5],[7,6],[7,8]],[[9,2],[1,3],[3,5],[7,67],[4,4]],[[8,2],[1,9],[3,43],[7,3],[43,0]],
+[[1,22],[1,2],[3,42],[7,29],[4,20]],[[1,5],[1,20],[3,24],[17,9],[4,10]],[[11,2],[1,110],[3,14],[7,4],[4,2]]]
+data_list=np.array(data_list)
+
+X[:,:,0]结果输出为：
+[[ 1  1  3  7  4]
+ [ 1  1  3  8  5]
+ [ 8  1  3  7  4]
+ [ 1  1  3  7  7]
+ [ 9  1  3  7  4]
+ [ 8  1  3  7 43]
+ [ 1  1  3  7  4]
+ [ 1  1  3 17  4]
+ [11  1  3  7  4]]
+X[:,:,1]结果输出为：
+[[  2   0   4   9   0]
+ [  4   5   6   9   0]
+ [  2   8   5   3   6]
+ [  1   2   5   6   8]
+ [  2   3   5  67   4]
+ [  2   9  43   3   0]
+ [ 22   2  42  29  20]
+ [  5  20  24   9  10]
+ [  2 110  14   4   2]]
+
+X[:,:,0:1]结果输出为：
+[[[ 1]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 4]]
+ 
+ [[ 1]
+  [ 1]
+  [ 3]
+  [ 8]
+  [ 5]]
+ 
+ [[ 8]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 4]]
+ 
+ [[ 1]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 7]]
+ 
+ [[ 9]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 4]]
+ 
+ [[ 8]
+  [ 1]
+  [ 3]
+  [ 7]
+  [43]]
+ 
+ [[ 1]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 4]]
+ 
+ [[ 1]
+  [ 1]
+  [ 3]
+  [17]
+  [ 4]]
+ 
+ [[11]
+  [ 1]
+  [ 3]
+  [ 7]
+  [ 4]]]
+~~~
+
+
+
+
+
+## DataFrame
+
+### as_matrix()
+
+~~~python
+df = pd.DataFrame(np.arange(12).reshape(3, 4))
+
+df
+   0  1   2   3
+0  0  1   2   3
+1  4  5   6   7
+2  8  9  10  11
+
+df.as_matrix() 
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+~~~
+
+
+
+### set_index()
+
+set_index方法，可以设置单索引和复合索引。 
+
+DataFrame.set_index(keys, drop=True, append=False, inplace=False, verify_integrity=False) 
+
+append添加新索引。
+
+~~~python
+In [307]: data
+Out[307]:
+     a    b  c    d
+0  bar  one  z  1.0
+1  bar  two  y  2.0
+2  foo  one  x  3.0
+3  foo  two  w  4.0
+ 
+In [308]: indexed1 = data.set_index('c')
+ 
+In [309]: indexed1
+Out[309]:
+     a    b    d
+c              
+z  bar  one  1.0
+y  bar  two  2.0
+x  foo  one  3.0
+w  foo  two  4.0
+ 
+In [310]: indexed2 = data.set_index(['a', 'b'])
+ 
+In [311]: indexed2
+Out[311]:
+         c    d
+a   b         
+bar one  z  1.0
+    two  y  2.0
+foo one  x  3.0
+    two  w  4.0
+~~~
+
+
+
+### T
+
+DataFrame.T：Transpose index and columns。
+
+
+
+### to_dict()
+
+~~~python
+In [4]: df
+Out[4]:
+  colA colB  colC  colD
+0    A    X   100    90
+1    A  NaN    50    60
+2    B   Ya    30    60
+3    C   Xb    50    80
+4    A   Xa    20    50
+
+In [5]: df.to_dict(orient='dict')
+Out[5]:
+{'colA': {0: 'A', 1: 'A', 2: 'B', 3: 'C', 4: 'A'},
+ 'colB': {0: 'X', 1: nan, 2: 'Ya', 3: 'Xb', 4: 'Xa'},
+ 'colC': {0: 100, 1: 50, 2: 30, 3: 50, 4: 20},
+ 'colD': {0: 90, 1: 60, 2: 60, 3: 80, 4: 50}}
+
+In [6]: df.to_dict(orient='list')
+Out[6]:
+{'colA': ['A', 'A', 'B', 'C', 'A'],
+ 'colB': ['X', nan, 'Ya', 'Xb', 'Xa'],
+ 'colC': [100, 50, 30, 50, 20],
+ 'colD': [90, 60, 60, 80, 50]}
+~~~
+
+
+
+### fillna()
+
+`fillna`(*value=None*)
+
+使用指定的方法填充NA / NaN值。
+
+**value** : 变量, 字典。　　
+
+返回：被充满的DataFrame。
+
+~~~python
+>>> df
+     A       B      C        D
+0  NaN  2.0    NaN    0
+1  3.0    4.0   NaN     1
+2  NaN  NaN  NaN     5
+3  NaN  3.0    NaN    4
+ 
+#将NAN值转换为0
+>>>df.fillna(0)
+    A   B   C   D
+0   0.0 2.0 0.0 0
+1   3.0 4.0 0.0 1
+2   0.0 0.0 0.0 5
+3   0.0 3.0 0.0 4
+
+#用字典替换
+>>>values = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+>>> df.fillna(value=values)
+    A   B   C   D
+0   0.0 2.0 2.0 0
+1   3.0 4.0 2.0 1
+2   0.0 1.0 2.0 5
+3   0.0 3.0 2.0 4
+~~~
+
+
+
+
+
+## Numpy
+
+### random.seed()
+
+np.random.seed()，每次运行代码时设置相同的seed，则每次生成的随机数相同。如果不设置seed，每次生成的随机数都会不一样。
+
+
+
+### unique()
+
+去除数组中的重复数字，并进行排序后输出。
+
+
+
+### unstack()
+
+![image-20190426143537470](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190426143537470.png)
+
+![image-20190426143739054](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190426143739054.png)
+
+
+
+### array()
+
+ Python中提供了list容器，可以当作数组使用。但列表中的元素可以是任何对象，因此列表中保存的是对象的指针。这样一来，为保存一个简单的列表[1,2,3]，就需要三个指针和三个整数对象。对于数值运算来说，这种结构显然不够高效。
+
+Python虽然也提供了array模块，但只支持一维数组，不支持多维数组(在TensorFlow里偏向于理解为矩阵)，也没有各种运算函数。因而不适合数值运算。
+
+NumPy的出现弥补了这些不足。
+
+~~~python
+a = np.array([2,3,4])
+[2 3 4] int32
+
+b = np.array([2.0,3.0,4.0])
+[ 2.  3.  4.] float64
+
+c = np.array([[1.0,2.0],[3.0,4.0]])
+[[ 1.  2.]
+ [ 3.  4.]] float64
+~~~
+
+
+
+
+
+
+
+## TensorFlow
+
+### get_variable()
+
+tf.get_variable(name,  shape, initializer, trainable)。
+
+获取具有这些参数的现有变量或创建一个新变量。 
+
+name：变量名称，shape：变量维度，initializer：变量初始化的方式。
+
+trainable：如果为True，则会默认将变量添加到图形集合GraphKeys.TRAINABLE_VARIABLES中。此集合用于优化器Optimizer类优化的的默认变量列表【可为optimizer指定其他的变量集合】，就是要训练的变量列表。
+
+初始化的方式有以下几种：
+
+tf.constant_initializer：常量初始化函数
+
+tf.random_normal_initializer：正态分布
+
+tf.truncated_normal_initializer：截取的正态分布
+
+tf.random_uniform_initializer：均匀分布
+
+tf.zeros_initializer：全是0
+
+tf.ones_initializer：全是1
+
+tf.uniform_unit_scaling_initializer：满足均匀分布，但不影响输出数量级的随机值。
+
+
+
+### contrib.layers.xavier_initializer()
+
+该函数返回一个用于初始化权重的初始化程序 “Xavier” 。这个初始化器用来保持每一层的梯度大小都差不多相同，从而保证输入变量的变化尺度不变，避免变化尺度在最后一层网络中爆炸或弥散。
+
+
+
+### nn.relu()
+
+将大于0的数保持不变，小于0的数置为0。
+
+~~~python
+a = tf.constant([-2,-1,0,2,3])
+with tf.Session() as sess:
+ 	print(sess.run(tf.nn.relu(a)))
+    
+[0 0 0 2 3]
+~~~
+
+
+
+### multiply()
+
+两个矩阵中对应元素各自相乘。
+
+格式: tf.multiply(x, y, name=None)
+
+x: 一个类型为:half, float32, float64, uint8, int8, uint16, int16, int32, int64, complex64, complex128的张量。 
+y: 一个类型跟张量x相同的张量。
+
+返回值： x * y element-wise。
+
+（1）multiply这个函数实现的是元素级别的相乘，也就是两个相乘的矩阵元素各自相乘，而不是矩阵乘法。 
+（2）两个相乘的数必须有相同的数据类型，不然会报错。
+
+
+
+### matmul()
+
+格式: tf.matmul(a, b, transpose_a=False, transpose_b=False, adjoint_a=False, adjoint_b=False, a_is_sparse=False, b_is_sparse=False, name=None)
+
+参数: 
+a: 一个类型为 float16, float32, float64, int32, complex64, complex128 且秩 > 1 的张量。 
+b: 一个类型跟张量a相同的张量。 
+transpose_a: 如果为真, a在进行乘法计算前进行转置。 
+transpose_b: 如果为真, b在进行乘法计算前进行转置。 
+adjoint_a: 如果为真, a在进行乘法计算前进行共轭和转置。 
+adjoint_b: 如果为真, b在进行乘法计算前进行共轭和转置。 
+a_is_sparse: 如果为真, a被处理为稀疏矩阵。 
+b_is_sparse: 如果为真, b被处理为稀疏矩阵。 
+name: 操作的名字（可选参数） 
+返回值： 一个跟张量a和b类型一样的张量，且内部矩阵是a和b中的相应矩阵的乘积。
+
+注意： （1）输入必须是矩阵，且其在转置后有相匹配的矩阵尺寸。 
+（2）两个矩阵必须都是同样的类型。
+
+
+
+### reduce_sum()
+
+压缩求和，用于降维。
+
+~~~python
+# 'x' is [[1, 1, 1],
+#		  [1, 1, 1]]
+
+#求和
+tf.reduce_sum(x) ==> 6
+
+#按列求和
+tf.reduce_sum(x, 0) ==> [2, 2, 2]
+
+#按行求和
+tf.reduce_sum(x, 1) ==> [3, 3]
+
+#按照行的维度求和
+tf.reduce_sum(x, 1, keep_dims=True) ==> [[3], [3]]
+
+#行列求和
+tf.reduce_sum(x, [0, 1]) ==> 6
+~~~
+
+
+
+### reset_default_graph()
+
+用于清除默认图形堆栈并重置全局默认图形。
+
+注意：默认图形是当前线程的一个属性，该tf.reset_default_graph函数只适用于当前线程。当一个tf.Session或tf.InteractiveSession激活时调用这个函数会导致未定义的行为：调用此函数后使用任何以前创建的tf.Operation或tf.Tensor对象将导致未定义的行为。
+
+
+
+### placeholder()
+
+~~~python
+tf.placeholder(
+    dtype,
+    shape=None,
+    name=None
+)
+~~~
+
+**参数：**
+
+1. dtype：数据类型。常用的是tf.float32，tf.float64等数值类型。
+2. shape：数据形状。默认是None，就是一维值，也可以是多维（比如[2,3], [None, 3]表示列是3，行不定）
+3. name：名称。
+
+为什么要用placeholder？
+
+```
+Tensorflow的设计理念称为计算流图。在编写程序时，首先构筑整个系统的graph，代码不会直接生效，这一点和python的其他数值计算库（如Numpy等）不同，graph为静态的，类似于docker中的镜像。然后，在实际运行时，启动一个session，程序才会真正运行。这样做的好处是：避免反复切换底层程序实际运行的上下文。我们知道，很多python程序的底层为C语言或其他语言，执行一行脚本，就要切换一次，是有成本的，tensorflow通过计算流图的方式，优化整个session需要执行的代码，是很有优势的。
+
+所以placeholder()函数是在神经网络构建graph时在模型中的占位，此时并没有把要输入的数据传入模型，它只会分配必要的内存。等建立session，在会话中，运行模型的时候通过feed_dict()函数向占位符喂入数据。
+```
+
+
+### nn.embedding_lookup()
+
+~~~python
+tf.nn.embedding_lookup(
+               params,
+               ids
+)
+~~~
+
+- params: 表示完整的嵌入张量。
+- ids: 一个类型为int32或int64的Tensor，包含要在params中查找的id。
+
+tf.nn.embedding_lookup()函数的用法主要是选取一个张量里面索引对应的元素。
+
+tf.nn.embedding_lookup(tensor,id)：即tensor就是输入的张量，id 是张量对应的索引。
+
+tf.nn.embedding_lookup()是根据input_ids中的id，寻找embeddings中的第id行。比如input_ids=[1,3,5]，则找出embeddings中第1，3，5行，组成一个tensor返回。embedding_lookup不是简单的查表，id对应的向量是可训练的，训练参数个数应该是 category num*embedding size，也就是说lookup是一种全连接层。
+
+
+
+### reshape()
+
+~~~python
+tf.reshape(tensor,shape,name=None)
+~~~
+
+将tensor变换为参数shape形式，其中的shape为一个列表形式。-1所代表的含义是不用亲自去指定这一维的大小，函数会自动进行计算，但列表中只能存在一个-1。
+reshape进行矩阵变换的流程是： 将矩阵t变换为一维矩阵，然后再对矩阵形式进行更改。
+
+~~~python
+reshape(t,shape) =>reshape(t,[-1]) =>reshape(t,shape)
+~~~
+
+
+
+### concat()
+
+用来拼接张量。
+
+~~~python
+tf.concat([tensor1, tensor2, tensor3,...], axis)
+
+t1 = [[1, 2, 3], [4, 5, 6]]
+t2 = [[7, 8, 9], [10, 11, 12]]
+tf.concat([t1, t2], 0)  # [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+tf.concat([t1, t2], 1)  # [[1, 2, 3, 7, 8, 9], [4, 5, 6, 10, 11, 12]]
+ 
+# tensor t3 with shape [2, 3]
+# tensor t4 with shape [2, 3]
+tf.shape(tf.concat([t3, t4], 0))  # [4, 3]
+tf.shape(tf.concat([t3, t4], 1))  # [2, 6]
+~~~
+
+
+
+### reduce_mean()
+
+用于计算张量tensor沿指定数轴（tensor某一维度）上的平均值，主要用作降维或者计算平均值。
+
+~~~python
+reduce_mean(input_tensor,
+                axis=None,
+                keep_dims=False,
+                name=None)
+~~~
+
+- input_tensor： 输入的待降维的tensor。
+- axis： 指定的轴，如果不指定，则计算所有元素的均值。
+- keep_dims：是否降维度，设置为True，输出的结果保持输入tensor的形状，设置为False，输出结果会降低维度。
+- name： 操作名称。
+
+~~~python
+ x = [[1,2,3],
+      [1,2,3]]
+ 
+xx = tf.cast(x,tf.float32)
+ 
+mean_all = tf.reduce_mean(xx, keep_dims=False)
+mean_0 = tf.reduce_mean(xx, axis=0, keep_dims=False)
+mean_1 = tf.reduce_mean(xx, axis=1, keep_dims=False)
+  
+with tf.Session() as sess:
+    m_a,m_0,m_1 = sess.run([mean_all, mean_0, mean_1])
+ 
+print m_a    # output: 2.0
+print m_0    # output: [ 1.  2.  3.]
+print m_1    #output:  [ 2.  2.]
+~~~
+
+如果设置保持原来的张量维度，keep_dims=True ，结果：
+
+~~~python
+print m_a    # output: [[ 2.]]
+print m_0    # output: [[ 1.  2.  3.]]
+print m_1    #output:  [[ 2.], [ 2.]]
+~~~
+
+
+
+### train.Optimizer.minimize()
+
+~~~python
+tf.train.Optimizer.minimize(loss, global_step=None, var_list=None, gate_gradients=1, 
+aggregation_method=None, colocate_gradients_with_ops=False, name=None, grad_loss=None)
+~~~
+
+添加操作节点，用于最小化loss，并更新var_list。该函数是简单的合并了compute_gradients()与apply_gradients()函数，返回为优化更新后的var_list。如果global_step非None，该操作还会为global_step做自增。
