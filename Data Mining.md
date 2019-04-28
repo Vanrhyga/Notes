@@ -2137,7 +2137,7 @@ if __name__ == '__main__':
 
 命令行解析信息包含两部分，分别是使用模式格式和选项描述格式。
 
-## **使用模式格式**
+## 使用模式格式
 
 以usage:开始，以空行结束，如上代码段所示。它主要描述了用户添加命令行参数时的格式，也就是使用时的格式，解析也是按照此格式来进行。
 
@@ -2175,7 +2175,7 @@ if __name__ == '__main__':
 
 
 
-## **选项描述格式**
+## 选项描述格式
 
 选项描述同样必不可少，尤其是当选项有参数，并且还需要为它赋默认值时。
 
@@ -2238,7 +2238,7 @@ python3 test.py ship Guardian move 100 150 --speed=15
 
 
 
-### Epoch
+# Epoch
 
 当完整的数据集通过了神经网络一次，这个过程称为一个 epoch。然而，当一个 epoch 对于计算机而言太庞大的时候，就需要把它分成多个小块。
 
@@ -2248,7 +2248,7 @@ python3 test.py ship Guardian move 100 150 --speed=15
 
 
 
-### **BATCH**
+# BATCH
 
 在不能将数据一次性通过神经网络时，就需要将数据集分成几个 batch。
 
@@ -2256,7 +2256,7 @@ Batch size指一个 batch 中的样本总数。记住：batch size 和 number of
 
 
 
-### 迭代
+# 迭代
 
 **迭代**
 
@@ -2264,7 +2264,7 @@ Batch size指一个 batch 中的样本总数。记住：batch size 和 number of
 
 
 
-### pd.read_csv()
+# pd.read_csv()
 
 dl_data.csv文件：
 
@@ -2318,7 +2318,7 @@ index_col=0表示以原有数据的第一列(索引为0)当作行索引。
 
 
 
-### eval()
+# eval()
 
 eval() 函数用来执行一个字符串表达式，并返回表达式的值。
 
@@ -2346,7 +2346,7 @@ eval(expression[, globals[, locals]])
 
 
 
-### 切片
+# 切片
 
 对于X[:,0]：取二维数组中第一维的所有数据。
 
@@ -2469,9 +2469,9 @@ X[:,:,0:1]结果输出为：
 
 
 
-## DataFrame
+# DataFrame
 
-### as_matrix()
+## as_matrix()
 
 ~~~python
 df = pd.DataFrame(np.arange(12).reshape(3, 4))
@@ -2490,7 +2490,7 @@ array([[ 0,  1,  2,  3],
 
 
 
-### set_index()
+## set_index()
 
 set_index方法，可以设置单索引和复合索引。 
 
@@ -2532,13 +2532,13 @@ foo one  x  3.0
 
 
 
-### T
+## T
 
 DataFrame.T：Transpose index and columns。
 
 
 
-### to_dict()
+## to_dict()
 
 ~~~python
 In [4]: df
@@ -2567,7 +2567,7 @@ Out[6]:
 
 
 
-### fillna()
+## fillna()
 
 `fillna`(*value=None*)
 
@@ -2607,21 +2607,21 @@ Out[6]:
 
 
 
-## Numpy
+# Numpy
 
-### random.seed()
+## random.seed()
 
 np.random.seed()，每次运行代码时设置相同的seed，则每次生成的随机数相同。如果不设置seed，每次生成的随机数都会不一样。
 
 
 
-### unique()
+## unique()
 
 去除数组中的重复数字，并进行排序后输出。
 
 
 
-### unstack()
+## unstack()
 
 ![image-20190426143537470](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190426143537470.png)
 
@@ -2629,7 +2629,7 @@ np.random.seed()，每次运行代码时设置相同的seed，则每次生成的
 
 
 
-### array()
+## array()
 
  Python中提供了list容器，可以当作数组使用。但列表中的元素可以是任何对象，因此列表中保存的是对象的指针。这样一来，为保存一个简单的列表[1,2,3]，就需要三个指针和三个整数对象。对于数值运算来说，这种结构显然不够高效。
 
@@ -2655,9 +2655,9 @@ c = np.array([[1.0,2.0],[3.0,4.0]])
 
 
 
-## TensorFlow
+# TensorFlow
 
-### get_variable()
+## get_variable()
 
 tf.get_variable(name,  shape, initializer, trainable)。
 
@@ -2685,13 +2685,13 @@ tf.uniform_unit_scaling_initializer：满足均匀分布，但不影响输出数
 
 
 
-### contrib.layers.xavier_initializer()
+## contrib.layers.xavier_initializer()
 
 该函数返回一个用于初始化权重的初始化程序 “Xavier” 。这个初始化器用来保持每一层的梯度大小都差不多相同，从而保证输入变量的变化尺度不变，避免变化尺度在最后一层网络中爆炸或弥散。
 
 
 
-### nn.relu()
+## nn.relu()
 
 将大于0的数保持不变，小于0的数置为0。
 
@@ -2705,7 +2705,7 @@ with tf.Session() as sess:
 
 
 
-### multiply()
+## multiply()
 
 两个矩阵中对应元素各自相乘。
 
@@ -2721,7 +2721,7 @@ y: 一个类型跟张量x相同的张量。
 
 
 
-### matmul()
+## matmul()
 
 格式: tf.matmul(a, b, transpose_a=False, transpose_b=False, adjoint_a=False, adjoint_b=False, a_is_sparse=False, b_is_sparse=False, name=None)
 
@@ -2742,7 +2742,7 @@ name: 操作的名字（可选参数）
 
 
 
-### reduce_sum()
+## reduce_sum()
 
 压缩求和，用于降维。
 
@@ -2768,7 +2768,7 @@ tf.reduce_sum(x, [0, 1]) ==> 6
 
 
 
-### reset_default_graph()
+## reset_default_graph()
 
 用于清除默认图形堆栈并重置全局默认图形。
 
@@ -2776,7 +2776,7 @@ tf.reduce_sum(x, [0, 1]) ==> 6
 
 
 
-### placeholder()
+## placeholder()
 
 ~~~python
 tf.placeholder(
@@ -2801,7 +2801,7 @@ Tensorflow的设计理念称为计算流图。在编写程序时，首先构筑�
 ```
 
 
-### nn.embedding_lookup()
+## nn.embedding_lookup()
 
 ~~~python
 tf.nn.embedding_lookup(
@@ -2821,7 +2821,7 @@ tf.nn.embedding_lookup()是根据input_ids中的id，寻找embeddings中的第id
 
 
 
-### reshape()
+## reshape()
 
 ~~~python
 tf.reshape(tensor,shape,name=None)
@@ -2836,7 +2836,7 @@ reshape(t,shape) =>reshape(t,[-1]) =>reshape(t,shape)
 
 
 
-### concat()
+## concat()
 
 用来拼接张量。
 
@@ -2856,7 +2856,7 @@ tf.shape(tf.concat([t3, t4], 1))  # [2, 6]
 
 
 
-### reduce_mean()
+## reduce_mean()
 
 用于计算张量tensor沿指定数轴（tensor某一维度）上的平均值，主要用作降维或者计算平均值。
 
@@ -2900,7 +2900,7 @@ print m_1    #output:  [[ 2.], [ 2.]]
 
 
 
-### train.Optimizer.minimize()
+## train.Optimizer.minimize()
 
 ~~~python
 tf.train.Optimizer.minimize(loss, global_step=None, var_list=None, gate_gradients=1, 
@@ -2908,3 +2908,119 @@ aggregation_method=None, colocate_gradients_with_ops=False, name=None, grad_loss
 ~~~
 
 添加操作节点，用于最小化loss，并更新var_list。该函数是简单的合并了compute_gradients()与apply_gradients()函数，返回为优化更新后的var_list。如果global_step非None，该操作还会为global_step做自增。
+
+
+
+## ConfigProto()
+
+用在创建session时，对session进行参数配置。
+
+~~~python
+config = tf.ConfigProto(log_device_placement=True allow_soft_placement=True)
+config.gpu_options.per_process_gpu_memory_fraction = 0.4  #占用40%显存
+sess = tf.Session(config=config)
+~~~
+
+**记录设备指派情况 :  tf.ConfigProto(log_device_placement=True)**
+
+获取 operations 和 Tensor 被指派到哪个设备(几号CPU或几号GPU)上运行，会在终端打印出各项操作是在哪个设备上运行的。
+
+**自动选择运行设备 ： tf.ConfigProto(allow_soft_placement=True)**
+
+允许tf自动选择一个存在且可用的设备来运行操作。
+
+**限制GPU资源使用：**
+
+为加快运行效率，TensorFlow在初始化时会尝试分配所有可用的GPU显存资源给自己，这在多人使用的服务器上工作就会导致GPU占用，别人无法使用GPU。
+
+tf提供了两种控制GPU资源使用的方法，一是让TensorFlow在运行过程中动态申请显存，需要多少就申请多少；第二种方式是限制GPU的使用率。
+
+**一、动态申请显存**
+
+~~~python
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
+~~~
+
+**二、限制GPU使用率**
+
+~~~python
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.4  #占用40%显存
+session = tf.Session(config=config)
+
+
+gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+config=tf.ConfigProto(gpu_options=gpu_options)
+session = tf.Session(config=config)
+~~~
+
+
+
+## InteractiveSession()
+
+在运行图的时候，可以插入一些计算图。这些计算图是由某些操作(operations)构成的。这对于工作在交互式环境中的人来说非常便利，比如使用IPython。
+
+tf.Session()：需要在启动session前构建整个计算图，然后启动该计算图。
+
+意思就是在使用tf.InteractiveSession()来构建会话时，可以先构建一个session然后再定义操作（operation），如果使用tf.Session()来构建会话，需要在会话构建前定义好全部的操作（operation），然后再构建会话。
+
+~~~python
+tf.InteractiveSession：可以在运行图的时候，插入新的图，方便地使用可交互环境执行
+sess = tf.InteractiveSession()
+a = tf.constant(5.0)
+b = tf.constant(6.0)
+c = a * b
+# We can just use 'c.eval()' without passing 'sess'
+print(c.eval())
+sess.close()
+
+tf.Session：先用操作构建好图，再创建session，再执行图。
+# Build a graph.
+a = tf.constant(5.0)
+b = tf.constant(6.0)
+c = a * b
+# Launch the graph in a session.
+sess = tf.Session()
+# Evaluate the tensor `c`.
+print(sess.run(c))
+~~~
+
+
+
+## global_variables_initializer()
+
+以一个简单的线性模型为例。首先，使用`tf.placeholder`定义模型输入，然后定义两个全局变量，同时它们都是训练参数，最后定义学习模型。
+
+~~~python
+x  = tf.placeholder(tf.float32, [None, 784])
+W = tf.Variable(tf.zeros([784,10]), name='W')
+b = tf.Variable(tf.zeros([10]), name='b') 
+y = tf.matmul(x, W) + b
+~~~
+
+在使用变量前，必须对变量进行初始化。按照习惯用法，使用`tf.global_variables_initializer()`将所有全局变量的初始化器汇总，并对其进行初始化。
+
+~~~python
+init = tf.global_variables_initializer()
+with tf.Session() as sess:
+  sess.run(init)
+~~~
+
+按照既有经验，其计算图大致如下图所示：
+
+![image-20190428194935825](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190428194935825.png)
+
+
+
+
+
+# sklearn.utils.shuffle()
+
+打乱样本。
+
+![image-20190428202254380](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190428202254380.png)
+
+![image-20190428202605581](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190428202605581.png)
+
