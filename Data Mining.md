@@ -3014,6 +3014,24 @@ with tf.Session() as sess:
 
 
 
+## sess.run()
+
+~~~python
+run(fetches, feed_dict=None, options=None, run_metadata=None)
+~~~
+
+执行操作，计算 fetches 中的张量值。
+
+fetches 参数可能是一个单一图元素，或任意嵌套列表、元组、namedtuple、字典，或有序字典在叶子中包含图元素。
+
+feed_dict的作用是给使用placeholder创建出来的tensor赋值。
+
+返回值为fetches的执行结果。如果fetches是一个元素，就返回一个值；若fetches是一个list，则返回list的值；若fetches是一个字典，则返回和fetches同keys的字典。
+
+
+
+
+
 
 
 # sklearn.utils.shuffle()
@@ -3023,4 +3041,58 @@ with tf.Session() as sess:
 ![image-20190428202254380](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190428202254380.png)
 
 ![image-20190428202605581](/Users/vanrhyga/Library/Application Support/typora-user-images/image-20190428202605581.png)
+
+
+
+# //
+
+除号和其他大多数编程语言是不同的。只有一个反斜杠，会输出完整运算结果，即会输出小数点后的：
+
+~~~python
+>>> a=5
+>>> b=2
+>>> a/b
+2.5
+~~~
+
+有两个反斜杠时，只输出整数，即只输出小数点前的：
+
+~~~python
+>>> a=5
+>>> b=2
+>>> a//b
+2
+~~~
+
+
+
+# extend()
+
+用于在列表末尾一次性追加另一个序列中的多个值（用新列表扩展原来的列表）。
+
+~~~python
+list.extend(seq)
+~~~
+
+- seq -- 元素列表。
+
+该方法没有返回值，但会在已存在的列表中添加新的列表内容。
+
+~~~python
+aList = [123, 'xyz', 'zara', 'abc', 123]
+bList = [2009, 'manni']
+aList.extend(bList)
+
+print "Extended List : ", aList
+
+Extended List :  [123, 'xyz', 'zara', 'abc', 123, 2009, 'manni']
+~~~
+
+
+
+# heapq.nlargest()
+
+~~~python
+print nlargest(4, a) ＃从list a中找出最大的四个数
+~~~
 
